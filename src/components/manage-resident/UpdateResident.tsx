@@ -12,16 +12,43 @@ import { Button } from '@/components/ui/button';
 import axios from 'axios';
 import DefaultProfile from '@/assets/default.jpg';
 
-export default function AddResident({
-  setShowAddResident,
+type Resident = {
+  resident_id: number;
+
+  resident_firstname: string;
+  resident_middlename: string;
+  resident_lastname: string;
+  resident_extension: string;
+  resident_birthday: string;
+  resident_place_of_birth: string;
+  resident_nationality: string;
+  resident_religion: string;
+  resident_weight: string;
+  resident_height: string;
+  resident_father_name: string;
+  resident_mother_name: string;
+  resident_houseno: string;
+
+  resident_gender: string;
+  resident_image: string;
+  resident_type: string;
+  resident_civilstatus: string;
+  resident_purok: string;
+};
+
+export default function UpdateResident({
+  setShowUpdateForm,
+  residentID,
 }: {
-  setShowAddResident: (value: boolean) => void;
+  residentID: number;
+  setShowUpdateForm: (value: boolean) => void;
 }) {
   const [image, setImage] = useState<string | null>(null);
   const [residentGender, setResidentGender] = useState<string>('');
   const [civilStatus, setCivilStatus] = useState<string>('');
   const [purok, setPurok] = useState<string>('');
   const [residentType, setResidentType] = useState<string>('');
+  //   const [residentSpecific, setResidentSpecific] = useState<Resident >({});
   const [residentDemogprahy, setResidentDemogprahy] = useState({
     resident_firstname: '',
     resident_middlename: '',
@@ -37,7 +64,28 @@ export default function AddResident({
     resident_father_name: '',
     resident_mother_name: '',
     resident_houseno: '',
+
+    resident_gender: '',
+    resident_type: '',
+    resident_civilstatus: '',
+    resident_purok: '',
   });
+
+  const fetchResident = () => {
+    axios
+      .get(`${import.meta.env.VITE_PROFILING}/resident.php`, {
+        params: { resident_id: residentID },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setResidentDemogprahy(res.data[0]);
+        setImage(res.data[0].resident_image);
+      });
+  };
+
+  useEffect(() => {
+    fetchResident();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -50,13 +98,14 @@ export default function AddResident({
     console.log('submit');
 
     axios
-      .post(`${import.meta.env.VITE_PROFILING}/resident.php`, {
+      .put(`${import.meta.env.VITE_PROFILING}/resident.php`, {
         ...residentDemogprahy,
         resident_gender: residentGender,
         resident_image: image,
         resident_type: residentType,
         resident_civilstatus: civilStatus,
         resident_purok: purok,
+        resident_id: residentID,
       })
       .then((res: any) => {
         console.log(res.data);
@@ -111,11 +160,10 @@ export default function AddResident({
           <div className="mb-2">
             <img
               className="w-full h-[20rem] object-contain rounded-lg  mb-4"
-              src={image! ? image! : DefaultProfile}
+              src={image! ? image : DefaultProfile}
             />
             <Label>Resident Image</Label>
             <Input
-              required
               type="file"
               accept="image/*"
               onChange={handleChangeImage}
@@ -125,88 +173,90 @@ export default function AddResident({
           <div className="w-full">
             <Label>First name</Label>
             <Input
+              defaultValue={residentDemogprahy.resident_firstname}
               type="text"
               onChange={handleInputChange}
               name="resident_firstname"
               className="w-full"
-              required
             />
           </div>
 
           <div className="w-full">
             <Label>Middle name</Label>
             <Input
+              defaultValue={residentDemogprahy.resident_middlename}
               onChange={handleInputChange}
               name="resident_middlename"
               className="w-full"
-              required
             />
           </div>
 
           <div className="w-full">
             <Label>Last name</Label>
             <Input
+              defaultValue={residentDemogprahy.resident_lastname}
               onChange={handleInputChange}
               name="resident_lastname"
               className="w-full"
-              required
             />
           </div>
 
           <div className="w-full">
             <Label>Extension</Label>
             <Input
+              defaultValue={residentDemogprahy.resident_extension}
               onChange={handleInputChange}
               name="resident_extension"
               className="w-full"
-              required
             />
           </div>
         </div>
         <div className="w-full">
           <Label>Birthday</Label>
           <Input
+            defaultValue={residentDemogprahy.resident_birthday}
             onChange={handleInputChange}
             name="resident_birthday"
             type="date"
             className="w-full"
-            required
           />
         </div>
         <div className="flex gap-4">
           <div className="w-full">
             <Label>Place of Birth</Label>
             <Input
+              defaultValue={residentDemogprahy.resident_place_of_birth}
               onChange={handleInputChange}
               name="resident_place_of_birth"
               className="w-full"
-              required
             />
           </div>
 
           <div className="w-full">
             <Label>Nationality</Label>
             <Input
+              defaultValue={residentDemogprahy.resident_nationality}
               onChange={handleInputChange}
               name="resident_nationality"
               className="w-full"
-              required
             />
           </div>
 
           <div className="w-full">
             <Label>Religion</Label>
             <Input
+              defaultValue={residentDemogprahy.resident_religion}
               onChange={handleInputChange}
               name="resident_religion"
               className="w-full"
-              required
             />
           </div>
         </div>
         <div className="flex gap-2">
           <div className="w-full ">
-            <Label>Gender</Label>
+            <Label>
+              Gender (current: {residentDemogprahy.resident_gender})
+            </Label>
 
             <Select onValueChange={handleResidentGenderChange}>
               <SelectTrigger>
@@ -220,7 +270,7 @@ export default function AddResident({
           </div>
 
           <div className="w-full ">
-            <Label>Type</Label>
+            <Label>Type (current: {residentDemogprahy.resident_type})</Label>
 
             <Select onValueChange={handleResidentType}>
               <SelectTrigger>
@@ -239,26 +289,28 @@ export default function AddResident({
           <div className="w-full">
             <Label>Weight.(55kg)</Label>
             <Input
+              defaultValue={residentDemogprahy.resident_weight}
               onChange={handleInputChange}
               name="resident_weight"
               className="w-full"
-              required
             />
           </div>
 
           <div className="w-full">
             <Label>Height (5'5ft)</Label>
             <Input
+              defaultValue={residentDemogprahy.resident_height}
               onChange={handleInputChange}
               name="resident_height"
               className="w-full"
-              required
             />
           </div>
         </div>
 
         <div className="w-full ">
-          <Label>Civil Status</Label>
+          <Label>
+            Civil Status (current: {residentDemogprahy.resident_civilstatus})
+          </Label>
 
           <Select onValueChange={handleCivilStatus}>
             <SelectTrigger>
@@ -275,20 +327,20 @@ export default function AddResident({
           <div className="w-full">
             <Label>Father's Name</Label>
             <Input
+              defaultValue={residentDemogprahy.resident_father_name}
               onChange={handleInputChange}
               name="resident_father_name"
               className="w-full"
-              required
             />
           </div>
 
           <div className="w-full">
             <Label>Mother's Name </Label>
             <Input
+              defaultValue={residentDemogprahy.resident_mother_name}
               onChange={handleInputChange}
               name="resident_mother_name"
               className="w-full"
-              required
             />
           </div>
         </div>
@@ -298,14 +350,16 @@ export default function AddResident({
           <div>
             <Label>House No.</Label>
             <Input
+              defaultValue={residentDemogprahy.resident_houseno}
               onChange={handleInputChange}
               name="resident_houseno"
               className="w-full"
-              required
             />
           </div>
           <div className="w-full ">
-            <Label>Purok/Zone</Label>
+            <Label>
+              Purok/Zone (current: {residentDemogprahy.resident_purok})
+            </Label>
 
             <Select onValueChange={handlePurok}>
               <SelectTrigger>
@@ -328,7 +382,7 @@ export default function AddResident({
         </div>
 
         <div className="mt-[2rem]">
-          <Button onClick={() => setShowAddResident(false)}>Cancel</Button>
+          <Button onClick={() => setShowUpdateForm(false)}>Cancel</Button>
 
           <Button type="submit" className="ml-2">
             Submit
