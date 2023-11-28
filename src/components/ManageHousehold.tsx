@@ -16,62 +16,50 @@ import { Input } from './ui/input';
 
 import moment from 'moment';
 import AddHousehold from './manage-household/AddHousehold';
+import UpdateHousehold from './manage-household/UpdateHousehold';
 
-type Resident = {
-  resident_id: number;
-
-  resident_firstname: string;
-  resident_middlename: string;
-  resident_lastname: string;
-  resident_extension: string;
-  resident_birthday: string;
-  resident_place_of_birth: string;
-  resident_nationality: string;
-  resident_religion: string;
-  resident_weight: string;
-  resident_height: string;
-  resident_father_name: string;
-  resident_mother_name: string;
-  resident_houseno: string;
-
-  resident_gender: string;
-  resident_image: string;
-  resident_type: string;
-  resident_civilstatus: string;
-  resident_purok: string;
-  resident_address: string;
+type Household = {
+  house_id: number;
+  house_no: string;
+  house_purok: string;
+  house_address: string;
 };
 
 export default function ManageHousehold() {
-  const [houseNo, setHouseNo] = useState<string>('');
-  const [purok, setPurok] = useState<string>('');
-  const [defaultDate] = useState(moment().format('YYYY-MM-DD'));
-  const [residents, setResidents] = useState<Resident[]>([]);
+  const [household, setHousehold] = useState<Household[]>([]);
   const [showAddHousehold, setShowAddHousehold] = useState<boolean>(false);
-  const [residentSpecific, setResidentSpecific] = useState<Resident[]>([]);
   const [searchHousehold, setSearchHousehold] = useState<string>('');
+  const [householdId, setHouseholdId] = useState<number>(0);
+  const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
 
-  const fetchResidents = async () => {
-    axios.get(`${import.meta.env.VITE_PROFILING}/resident.php`).then((res) => {
+  const fetchHousehold = async () => {
+    axios.get(`${import.meta.env.VITE_PROFILING}/household.php`).then((res) => {
       console.log(res.data);
-      setResidents(res.data);
+      setHousehold(res.data);
     });
   };
 
   useEffect(() => {
-    fetchResidents();
+    fetchHousehold();
   }, []);
 
-  const handleDeleteResident = (id: number) => {
+  const handleDeleteHousehold = (id: number) => {
     console.log(id);
     axios
-      .delete(`${import.meta.env.VITE_PROFILING}/resident.php`, {
-        data: { resident_id: id },
+      .delete(`${import.meta.env.VITE_PROFILING}/household.php`, {
+        data: { house_id: id },
       })
       .then((res) => {
         console.log(res.data);
-        fetchResidents();
+        fetchHousehold();
       });
+  };
+
+  const handleShowUpdateForm = (id: number) => {
+    setHouseholdId(id);
+    setShowUpdateForm(true);
+
+    console.log(id);
   };
 
   return (
@@ -108,33 +96,24 @@ export default function ManageHousehold() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {residents
-                .filter(
-                  (resi) =>
-                    resi.resident_lastname.includes(searchHousehold) ||
-                    resi.resident_firstname.includes(searchHousehold) ||
-                    resi.resident_middlename.includes(searchHousehold),
-                )
-                .map((resident, index) => (
+              {household
+                .filter((house) => house.house_no.includes(searchHousehold))
+                .map((house, index) => (
                   <TableRow className="text-center" key={index}>
-                    <TableCell>{resident.resident_gender}</TableCell>
-                    <TableCell>{resident.resident_birthday}</TableCell>
-                    <TableCell>{resident.resident_birthday}</TableCell>
+                    <TableCell>{house.house_id}</TableCell>
+                    <TableCell>{house.house_no}</TableCell>
+                    <TableCell>{house.house_purok}</TableCell>
 
                     <TableCell className="flex justify-center">
                       <div className="flex gap-2">
                         <Button>View</Button>
                         <Button
-                        // onClick={() =>
-                        //   handleShowUpdateForm(resident.resident_id)
-                        // }
+                          onClick={() => handleShowUpdateForm(house.house_id)}
                         >
                           Update
                         </Button>
                         <Button
-                          onClick={() =>
-                            handleDeleteResident(resident.resident_id)
-                          }
+                          onClick={() => handleDeleteHousehold(house.house_id)}
                         >
                           Delete
                         </Button>
@@ -148,6 +127,13 @@ export default function ManageHousehold() {
       </div>
       {showAddHousehold && (
         <AddHousehold setShowAddHousehold={setShowAddHousehold} />
+      )}
+
+      {showUpdateForm && (
+        <UpdateHousehold
+          setShowUpdateForm={setShowUpdateForm}
+          householdId={householdId}
+        />
       )}
     </div>
   );

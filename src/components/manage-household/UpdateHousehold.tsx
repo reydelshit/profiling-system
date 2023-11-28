@@ -11,22 +11,43 @@ import {
 import { Button } from '@/components/ui/button';
 import axios from 'axios';
 
-export default function AddHousehold({
-  setShowAddHousehold,
+export default function UpdateHousehold({
+  setShowUpdateForm,
+  householdId,
 }: {
-  setShowAddHousehold: (value: boolean) => void;
+  householdId: number;
+  setShowUpdateForm: (value: boolean) => void;
 }) {
   const [purok, setPurok] = useState<string>('');
   const [houseNo, setHouseNo] = useState<string>('');
   const [address, setAddress] = useState<string>('');
+
+  const fetchHousehold = () => {
+    axios
+      .get(`${import.meta.env.VITE_PROFILING}/household.php`, {
+        params: { house_id: householdId },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setHouseNo(res.data[0].house_no);
+        setPurok(res.data[0].house_purok);
+        setAddress(res.data[0].house_address);
+
+        console.log(res.data[0].house_purok);
+      });
+  };
+
+  useEffect(() => {
+    fetchHousehold();
+  }, []);
 
   const handleSubmitResidentDemo = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log('submit');
 
     axios
-      .post(`${import.meta.env.VITE_PROFILING}/household.php`, {
-        // ...residentDemogprahy,
+      .put(`${import.meta.env.VITE_PROFILING}/household.php`, {
+        house_id: householdId,
         house_no: houseNo,
         house_purok: purok,
         house_address: address,
@@ -55,6 +76,7 @@ export default function AddHousehold({
           <div>
             <Label>House No.</Label>
             <Input
+              defaultValue={houseNo}
               onChange={(e) => setHouseNo(e.target.value)}
               name="resident_houseno"
               className="w-full"
@@ -62,7 +84,7 @@ export default function AddHousehold({
             />
           </div>
           <div className="w-full ">
-            <Label>Purok/Zone</Label>
+            <Label>Purok/Zone (current: {purok})</Label>
 
             <Select onValueChange={handlePurok}>
               <SelectTrigger>
@@ -85,6 +107,7 @@ export default function AddHousehold({
           <div>
             <Label>Full Address</Label>
             <Input
+              defaultValue={address}
               onChange={(e) => setAddress(e.target.value)}
               name="resident_address"
               className="w-full"
@@ -94,7 +117,7 @@ export default function AddHousehold({
         </div>
 
         <div className="mt-[2rem]">
-          <Button onClick={() => setShowAddHousehold(false)}>Cancel</Button>
+          <Button onClick={() => setShowUpdateForm(false)}>Cancel</Button>
 
           <Button type="submit" className="ml-2">
             Submit
