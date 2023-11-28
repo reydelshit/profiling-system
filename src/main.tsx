@@ -7,7 +7,7 @@ import Root from './components/Root/Root.tsx';
 import ManageResident from './components/ManageResident.tsx';
 import ManageHousehold from './components/ManageHousehold.tsx';
 import Settings from './components/Settings.tsx';
-import Clearance from './components/Clearance.tsx';
+import ManageResidentView from './components/ManageResidentView.tsx';
 
 const router = createBrowserRouter([
   {
@@ -18,10 +18,12 @@ const router = createBrowserRouter([
         path: '/manage-resident',
         element: <ManageResident />,
       },
+
       {
-        path: '/manage-resident/clearance/:id',
-        element: <Clearance />,
+        path: '/manage-resident/:id',
+        element: <ManageResidentView />,
       },
+
       {
         path: '/manage-household',
         element: <ManageHousehold />,

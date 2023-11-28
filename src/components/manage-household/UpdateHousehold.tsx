@@ -66,7 +66,7 @@ export default function UpdateHousehold({
   };
 
   return (
-    <div className="absolute w-full bg-violet-50 bg-opacity-75 h-screen py-[5rem] flex justify-center z-30 top-0">
+    <div className="absolute w-full bg-white bg-opacity-75 h-screen py-[5rem] flex justify-center z-30 top-0">
       <form
         className="bg-white border-2 h-fit mt-[2rem] p-6 rounded-md w-[40%]"
         onSubmit={handleSubmitResidentDemo}

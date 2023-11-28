@@ -21,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Label } from './components/ui/label';
 
 type Resident = {
   resident_id: number;
@@ -139,7 +140,7 @@ function App() {
   return (
     <div className="w-full">
       <h1 className="text-4xl my-10">DASHBOARD</h1>
-      <div className="flex gap-4 w-full border-2 justify-around p-2">
+      <div className="flex gap-4 w-full justify-around p-2">
         <Card className="text-start bg-violet-500 text-white w-full">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -156,47 +157,6 @@ function App() {
       </div>
 
       <div className="flex gap-10 justify-around my-4">
-        <div className="text-2xl p-2">
-          <h1 className="font-bold text-2xl mb-[2rem]">
-            Barangay Captain: {barangayCaptain}
-          </h1>
-
-          <h1 className="font-bold text-2xl mb-[2rem]">
-            Barangay Secretary: {barangaySecretary}
-          </h1>
-
-          <h1 className="font-bold text-2xl mb-[2rem]">
-            Barangay Treasurer: {barangayTreasurer}
-          </h1>
-        </div>
-
-        <div className="w-[40%]">
-          <Table className="border-2">
-            <TableHeader className="bg-violet-500 ">
-              <TableRow>
-                <TableHead className="text-white">Purok/Zone</TableHead>
-                <TableHead className="text-white">Population</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {[...Array(10)].map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>
-                    {
-                      residents.filter(
-                        (res) => parseInt(res.resident_purok) === index + 1,
-                      ).length
-                    }
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
-
-      <div className="flex">
         <div className="flex w-[70%] p-2 mt-[2rem] gap-[1rem] ">
           <div className="flex items-center ">
             <PieChart
@@ -240,6 +200,50 @@ function App() {
                 Female
               </span>
             </div>
+          </div>
+        </div>
+
+        <div className="w-[40%]">
+          <Table className="border-2">
+            <TableHeader className="bg-violet-500 ">
+              <TableRow>
+                <TableHead className="text-white">Purok/Zone</TableHead>
+                <TableHead className="text-white">Population</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...Array(10)].map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>
+                    {
+                      residents.filter(
+                        (res) => parseInt(res.resident_purok) === index + 1,
+                      ).length
+                    }
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      <div className="flex">
+        <div className="text-2xl p-5 w-[70%] bg-violet-50 h-fit rounded-lg">
+          <div>
+            <Label>Barangay Captaion</Label>
+            <p className="font-bold">{barangayCaptain}</p>
+          </div>
+
+          <div>
+            <Label>Barangay Secretary</Label>
+            <p className="font-bold">{barangaySecretary}</p>
+          </div>
+
+          <div>
+            <Label>Barangay Treasurer</Label>
+            <p className="font-bold">{barangayTreasurer}</p>
           </div>
         </div>
 

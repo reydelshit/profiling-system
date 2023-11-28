@@ -152,7 +152,7 @@ export default function UpdateResident({
   };
 
   return (
-    <div className="absolute w-full bg-violet-50 bg-opacity-75 h-fit py-[5rem] flex justify-center z-30 top-0">
+    <div className="absolute w-full bg-white bg-opacity-75 h-fit py-[5rem] flex justify-center z-30 top-0">
       <form
         className="bg-white border-2 h-full mt-[2rem] p-6 rounded-md w-[90%]"
         onSubmit={handleSubmitResidentDemo}

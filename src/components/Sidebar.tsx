@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
+import { Button } from './ui/button';
 
 export default function Sidebar() {
   const [barangayName, setBarangayName] = useState<string>('');
@@ -21,7 +22,7 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <div className="font-bold w-[20rem] h-screen flex flex-col items-center border-r-2 p-4">
+    <div className="relative font-bold w-[20rem] h-screen flex flex-col items-center border-r-2 p-4">
       <div>
         <h1 className="font-bold text-3xl">{barangayName}</h1>
         <p>{barangayAddress}</p>
@@ -53,6 +54,9 @@ export default function Sidebar() {
           {/* <RxDashboard className="text-md h-[1.5rem] w-[1.5rem]" /> Dashboard */}
           Settings
         </Link>
+      </div>
+      <div className="absolute bottom-10">
+        <Button className="w-[10rem]">Logout</Button>
       </div>
     </div>
   );

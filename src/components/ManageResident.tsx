@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom';
 import { Label } from './ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import moment from 'moment';
+
 type Resident = {
   resident_id: number;
 
@@ -140,18 +141,35 @@ export default function ManageResident() {
       });
   };
 
+  const handleTable = () => {
+    const printContents = document.getElementById('household-table')?.innerHTML;
+    const originalContents = document.body.innerHTML;
+
+    const printWindow = window.open('', '_blank');
+
+    if (printWindow) {
+      if (printContents && typeof printContents === 'string') {
+        printWindow.document.body.innerHTML = printContents;
+      }
+
+      printWindow.print();
+      printWindow.close();
+      document.body.innerHTML = originalContents;
+    }
+  };
+
   return (
     <div className="w-full h-full relative">
-      <h1>Manage Resident</h1>
+      <h1 className="text-4xl my-10">MANAGE RESIDENT</h1>
 
-      <div className="w-[100%] flex justify-center items-center border-2 mt-[2rem]">
+      <div className="w-[100%] flex justify-center items-center mt-[2rem]">
         <div className="w-[80%] mt-[5rem] flex flex-col">
           <div className="w-full flex justify-between my-2">
             <Button onClick={() => setShowAddResident(!showAddResident)}>
               New Resident
             </Button>
             <div className="flex gap-2 ">
-              <Button>Export</Button>
+              <Button onClick={handleTable}>Export</Button>
 
               <Input
                 onChange={(e) => setSearchResident(e.target.value)}
@@ -207,7 +225,10 @@ export default function ManageResident() {
                     <TableCell>{resident.resident_purok}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button>View</Button>
+                        <Link to={`/manage-resident/${resident.resident_id}`}>
+                          <Button> View </Button>
+                        </Link>
+
                         <Button
                           onClick={() =>
                             handleShowUpdateForm(resident.resident_id)

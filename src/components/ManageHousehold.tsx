@@ -62,18 +62,35 @@ export default function ManageHousehold() {
     console.log(id);
   };
 
+  const handleTable = () => {
+    const printContents = document.getElementById('household-table')?.innerHTML;
+    const originalContents = document.body.innerHTML;
+
+    const printWindow = window.open('', '_blank');
+
+    if (printWindow) {
+      if (printContents && typeof printContents === 'string') {
+        printWindow.document.body.innerHTML = printContents;
+      }
+
+      printWindow.print();
+      printWindow.close();
+      document.body.innerHTML = originalContents;
+    }
+  };
+
   return (
     <div className="w-full h-full relative">
-      <h1>Manage household</h1>
+      <h1 className="text-4xl my-10">MANAGE HOUSEHOLD</h1>
 
-      <div className="w-[100%] flex justify-center items-center border-2 mt-[2rem]">
+      <div className="w-[100%] flex justify-center items-center mt-[2rem]">
         <div className="w-[80%] mt-[5rem] flex flex-col">
           <div className="w-full flex justify-between my-2">
             <Button onClick={() => setShowAddHousehold(!showAddHousehold)}>
               New Household
             </Button>
             <div className="flex gap-2 ">
-              <Button>Export</Button>
+              <Button onClick={handleTable}>Export</Button>
 
               <Input
                 onChange={(e) => setSearchHousehold(e.target.value)}
@@ -82,47 +99,59 @@ export default function ManageHousehold() {
               />
             </div>
           </div>
-          <Table className="border-2">
-            <TableHeader className="bg-violet-500 ">
-              <TableRow>
-                <TableHead className="text-white text-center">
-                  Household ID No.
-                </TableHead>
-                <TableHead className="text-white text-center">
-                  House No.
-                </TableHead>
-                <TableHead className="text-white text-center">Purok</TableHead>
-                <TableHead className="text-white text-center">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {household
-                .filter((house) => house.house_no.includes(searchHousehold))
-                .map((house, index) => (
-                  <TableRow className="text-center" key={index}>
-                    <TableCell>{house.house_id}</TableCell>
-                    <TableCell>{house.house_no}</TableCell>
-                    <TableCell>{house.house_purok}</TableCell>
+          <div id="household-table">
+            <Table className="border-2">
+              <TableHeader className="bg-violet-500 ">
+                <TableRow>
+                  <TableHead className="text-white text-center">
+                    Household ID No.
+                  </TableHead>
+                  <TableHead className="text-white text-center">
+                    House No.
+                  </TableHead>
+                  <TableHead className="text-white text-center">
+                    Purok
+                  </TableHead>
 
-                    <TableCell className="flex justify-center">
-                      <div className="flex gap-2">
-                        <Button>View</Button>
-                        <Button
-                          onClick={() => handleShowUpdateForm(house.house_id)}
-                        >
-                          Update
-                        </Button>
-                        <Button
-                          onClick={() => handleDeleteHousehold(house.house_id)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
+                  <TableHead className="text-white text-center">
+                    Full Address
+                  </TableHead>
+                  <TableHead className="text-white text-center">
+                    Action
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {household
+                  .filter((house) => house.house_no.includes(searchHousehold))
+                  .map((house, index) => (
+                    <TableRow className="text-center" key={index}>
+                      <TableCell>{house.house_id}</TableCell>
+                      <TableCell>{house.house_no}</TableCell>
+                      <TableCell>{house.house_purok}</TableCell>
+                      <TableCell>{house.house_address}</TableCell>
+
+                      <TableCell className="flex justify-center">
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => handleShowUpdateForm(house.house_id)}
+                          >
+                            Update
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              handleDeleteHousehold(house.house_id)
+                            }
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </div>
       {showAddHousehold && (
