@@ -23,6 +23,11 @@ export default function Sidebar() {
           {/* <RxDashboard className="text-md h-[1.5rem] w-[1.5rem]" /> Dashboard */}
           Manage Household
         </Link>
+
+        <Link className="p-2 mb-2 flex items-center gap-2" to="/settings">
+          {/* <RxDashboard className="text-md h-[1.5rem] w-[1.5rem]" /> Dashboard */}
+          Settings
+        </Link>
       </div>
     </div>
   );

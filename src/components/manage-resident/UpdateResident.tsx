@@ -69,6 +69,7 @@ export default function UpdateResident({
     resident_type: '',
     resident_civilstatus: '',
     resident_purok: '',
+    resident_address: '',
   });
 
   const fetchResident = () => {
@@ -378,6 +379,16 @@ export default function UpdateResident({
                 <SelectItem value="10">10</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div>
+            <Label>Full Address</Label>
+            <Input
+              defaultValue={residentDemogprahy.resident_address}
+              onChange={handleInputChange}
+              name="resident_address"
+              className="w-full"
+              required
+            />
           </div>
         </div>
 

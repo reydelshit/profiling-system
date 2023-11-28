@@ -37,6 +37,7 @@ export default function AddResident({
     resident_father_name: '',
     resident_mother_name: '',
     resident_houseno: '',
+    resident_address: '',
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -324,6 +325,15 @@ export default function AddResident({
                 <SelectItem value="10">10</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div>
+            <Label>Full Address</Label>
+            <Input
+              onChange={handleInputChange}
+              name="resident_address"
+              className="w-full"
+              required
+            />
           </div>
         </div>
 

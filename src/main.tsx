@@ -6,6 +6,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Root from './components/Root/Root.tsx';
 import ManageResident from './components/ManageResident.tsx';
 import ManageHousehold from './components/ManageHousehold.tsx';
+import Settings from './components/Settings.tsx';
+import Clearance from './components/Clearance.tsx';
 
 const router = createBrowserRouter([
   {
@@ -17,8 +19,17 @@ const router = createBrowserRouter([
         element: <ManageResident />,
       },
       {
+        path: '/manage-resident/clearance/:id',
+        element: <Clearance />,
+      },
+      {
         path: '/manage-household',
         element: <ManageHousehold />,
+      },
+
+      {
+        path: '/settings',
+        element: <Settings />,
       },
     ],
   },
