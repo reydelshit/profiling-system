@@ -165,9 +165,16 @@ export default function ManageResident() {
       <div className="w-[100%] flex justify-center items-center mt-[2rem]">
         <div className="w-[80%] mt-[5rem] flex flex-col">
           <div className="w-full flex justify-between my-2">
-            <Button onClick={() => setShowAddResident(!showAddResident)}>
-              New Resident
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => setShowAddResident(!showAddResident)}>
+                New Resident
+              </Button>
+
+              <Link to="/manage-resident/clearance/">
+                <Button>Clearance</Button>
+              </Link>
+            </div>
+
             <div className="flex gap-2 ">
               <Button onClick={handleTable}>Export</Button>
 

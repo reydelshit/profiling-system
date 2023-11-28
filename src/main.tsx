@@ -8,6 +8,7 @@ import ManageResident from './components/ManageResident.tsx';
 import ManageHousehold from './components/ManageHousehold.tsx';
 import Settings from './components/Settings.tsx';
 import ManageResidentView from './components/ManageResidentView.tsx';
+import Clearance from './components/Clearance.tsx';
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,11 @@ const router = createBrowserRouter([
       {
         path: '/manage-resident/:id',
         element: <ManageResidentView />,
+      },
+
+      {
+        path: '/manage-resident/clearance',
+        element: <Clearance />,
       },
 
       {
