@@ -52,11 +52,27 @@ function App() {
   const [agePie, setAgePie] = useState([]) as any[];
 
   const [residents, setResidents] = useState<Resident[]>([]);
+  const [barangayCaptain, setBarangayCaptain] = useState<string>('');
+  const [barangaySecretary, setBarangaySecretary] = useState<string>('');
+  const [barangayTreasurer, setBarangayTreasurer] = useState<string>('');
 
   const fetchResidents = async () => {
     axios.get(`${import.meta.env.VITE_PROFILING}/resident.php`).then((res) => {
       console.log(res.data);
       setResidents(res.data);
+    });
+  };
+
+  const fetchBarangayOfficials = () => {
+    axios.get(`${import.meta.env.VITE_PROFILING}/officials.php`).then((res) => {
+      console.log(res.data);
+
+      if (res.data[0].official_type === 'Barangay Captain')
+        setBarangayCaptain(res.data[0].official_name);
+      if (res.data[1].official_type === 'Barangay Secretary')
+        setBarangaySecretary(res.data[1].official_name);
+      if (res.data[2].official_type === 'Barangay Treasurer')
+        setBarangayTreasurer(res.data[2].official_name);
     });
   };
 
@@ -117,6 +133,7 @@ function App() {
     getGenderPie();
     getAgeGroup();
     fetchResidents();
+    fetchBarangayOfficials();
   }, []);
 
   return (
@@ -140,16 +157,16 @@ function App() {
 
       <div className="flex gap-10 justify-around my-4">
         <div className="text-2xl p-2">
-          <h1 className="font-bold text-4xl mb-[2rem]">
-            Barangay Kapitan: Reydel Ocon
+          <h1 className="font-bold text-2xl mb-[2rem]">
+            Barangay Captain: {barangayCaptain}
           </h1>
 
-          <h1 className="font-bold text-4xl mb-[2rem]">
-            Barangay Secretary: Reydel Ocon
+          <h1 className="font-bold text-2xl mb-[2rem]">
+            Barangay Secretary: {barangaySecretary}
           </h1>
 
-          <h1 className="font-bold text-4xl mb-[2rem]">
-            Barangay Treasurer: Reydel Ocon
+          <h1 className="font-bold text-2xl mb-[2rem]">
+            Barangay Treasurer: {barangayTreasurer}
           </h1>
         </div>
 
@@ -162,10 +179,16 @@ function App() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {residents.map((resident, index) => (
+              {[...Array(10)].map((_, index) => (
                 <TableRow key={index}>
-                  <TableCell>{resident.resident_purok}</TableCell>
-                  <TableCell>{resident.resident_purok}</TableCell>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>
+                    {
+                      residents.filter(
+                        (res) => parseInt(res.resident_purok) === index + 1,
+                      ).length
+                    }
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
