@@ -9,6 +9,7 @@ import ManageHousehold from './components/ManageHousehold.tsx';
 import Settings from './components/Settings.tsx';
 import ManageResidentView from './components/ManageResidentView.tsx';
 import Clearance from './components/Clearance.tsx';
+import Login from './components/Login.tsx';
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,11 @@ const router = createBrowserRouter([
         element: <Settings />,
       },
     ],
+  },
+
+  {
+    path: '/login',
+    element: <Login />,
   },
 ]);
 

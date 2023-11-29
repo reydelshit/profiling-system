@@ -21,11 +21,16 @@ export default function Sidebar() {
     fetchBarangayDetails();
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('isLogin');
+    window.location.href = '/login';
+  };
+
   return (
-    <div className="relative font-bold w-[20rem] h-screen flex flex-col items-center border-r-2 p-4">
-      <div>
-        <h1 className="font-bold text-3xl">{barangayName}</h1>
-        <p>{barangayAddress}</p>
+    <div className="relative font-bold w-[20rem] h-screen flex flex-col items-center border-r-2">
+      <div className="text-center bg-violet-600 w-full p-2 text-white rounded-md">
+        <h2 className="text-3xl">{barangayName}</h2>
+        <p className="font-normal">{barangayAddress}</p>
       </div>
 
       <div className="mt-[15rem]">
@@ -56,7 +61,9 @@ export default function Sidebar() {
         </Link>
       </div>
       <div className="absolute bottom-10">
-        <Button className="w-[10rem]">Logout</Button>
+        <Button onClick={handleLogout} className="w-[10rem]">
+          Logout
+        </Button>
       </div>
     </div>
   );

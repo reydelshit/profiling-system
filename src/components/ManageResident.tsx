@@ -278,7 +278,7 @@ export default function ManageResident() {
       )}
 
       {showClearanceForm && (
-        <div className="absolute w-full h-screen bg-violet-50 bg-opacity-75 py-[5rem] flex justify-center z-30 top-0">
+        <div className="absolute w-full h-screen bg-white bg-opacity-75 py-[5rem] flex justify-center z-30 top-0">
           <div className="bg-white border-2 h-fit mt-[2rem] p-6 rounded-md w-[60%] ">
             <form onSubmit={handleSubmitClearance}>
               <div className="flex justify-around gap-5">

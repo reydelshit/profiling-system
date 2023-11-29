@@ -87,7 +87,7 @@ export default function Settings() {
       })
       .then((res: any) => {
         console.log(res.data);
-        // window.location.reload();
+        window.location.reload();
       });
   };
   return (

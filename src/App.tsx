@@ -183,7 +183,7 @@ function App() {
             <div className="cursor-pointer text-start justify-between flex items-center font-bold h-[4rem] p-2 bg-violet-100 w-full rounded-lg px-2">
               <h1 className="flex item-center">
                 <span className="text-[#5d383a] mr-2 text-xl">
-                  {genderPie.length}
+                  {residents.length}
                 </span>{' '}
                 Total Combined
               </h1>
