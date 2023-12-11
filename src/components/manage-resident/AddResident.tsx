@@ -12,6 +12,13 @@ import { Button } from '@/components/ui/button';
 import axios from 'axios';
 import DefaultProfile from '@/assets/default.jpg';
 
+type Household = {
+  house_id: number;
+  house_no: string;
+  house_purok: string;
+  house_address: string;
+};
+
 export default function AddResident({
   setShowAddResident,
 }: {
@@ -21,6 +28,7 @@ export default function AddResident({
   const [residentGender, setResidentGender] = useState<string>('');
   const [civilStatus, setCivilStatus] = useState<string>('');
   const [purok, setPurok] = useState<string>('');
+  const [householdName, setHouseholdName] = useState<string>('');
   const [residentType, setResidentType] = useState<string>('');
   const [residentDemogprahy, setResidentDemogprahy] = useState({
     resident_firstname: '',
@@ -40,6 +48,19 @@ export default function AddResident({
     resident_address: '',
   });
 
+  const [household, setHousehold] = useState<Household[]>([]);
+
+  const fetchHousehold = async () => {
+    axios.get(`${import.meta.env.VITE_PROFILING}/household.php`).then((res) => {
+      console.log(res.data);
+      setHousehold(res.data);
+    });
+  };
+
+  useEffect(() => {
+    fetchHousehold();
+  }, []);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     console.log(name, value);
@@ -58,6 +79,7 @@ export default function AddResident({
         resident_type: residentType,
         resident_civilstatus: civilStatus,
         resident_purok: purok,
+        resident_houseno: householdName,
       })
       .then((res: any) => {
         console.log(res.data);
@@ -82,6 +104,13 @@ export default function AddResident({
     const selectedValue = event;
     console.log(selectedValue);
     setPurok(selectedValue);
+  };
+
+  // resident_houseno
+  const handleChangeHousehold = (event: string) => {
+    const selectedValue = event;
+    console.log(selectedValue);
+    setHouseholdName(selectedValue);
   };
 
   const handleResidentType = (event: string) => {
@@ -298,12 +327,19 @@ export default function AddResident({
           Resedential Address
           <div>
             <Label>House No.</Label>
-            <Input
-              onChange={handleInputChange}
-              name="resident_houseno"
-              className="w-full"
-              required
-            />
+
+            <Select onValueChange={handleChangeHousehold}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Household" />
+              </SelectTrigger>
+              <SelectContent>
+                {household.map((house, index) => (
+                  <SelectItem key={index} value={house.house_no}>
+                    {house.house_no}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="w-full ">
             <Label>Purok/Zone</Label>

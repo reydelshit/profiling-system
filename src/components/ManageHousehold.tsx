@@ -23,6 +23,7 @@ type Household = {
   house_no: string;
   house_purok: string;
   house_address: string;
+  resident_count: string;
 };
 
 export default function ManageHousehold() {
@@ -104,7 +105,7 @@ export default function ManageHousehold() {
               <TableHeader className="bg-violet-500 ">
                 <TableRow>
                   <TableHead className="text-white text-center">
-                    Household ID No.
+                    Number of Person in Household
                   </TableHead>
                   <TableHead className="text-white text-center">
                     House No.
@@ -126,7 +127,7 @@ export default function ManageHousehold() {
                   .filter((house) => house.house_no.includes(searchHousehold))
                   .map((house, index) => (
                     <TableRow className="text-center" key={index}>
-                      <TableCell>{house.house_id}</TableCell>
+                      <TableCell>{house.resident_count}</TableCell>
                       <TableCell>{house.house_no}</TableCell>
                       <TableCell>{house.house_purok}</TableCell>
                       <TableCell>{house.house_address}</TableCell>

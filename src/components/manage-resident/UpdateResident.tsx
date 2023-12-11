@@ -101,11 +101,21 @@ export default function UpdateResident({
     axios
       .put(`${import.meta.env.VITE_PROFILING}/resident.php`, {
         ...residentDemogprahy,
-        resident_gender: residentGender,
+        resident_gender:
+          residentGender.length > 0
+            ? residentGender
+            : residentDemogprahy.resident_gender,
         resident_image: image,
-        resident_type: residentType,
-        resident_civilstatus: civilStatus,
-        resident_purok: purok,
+        resident_type:
+          residentType.length > 0
+            ? residentType
+            : residentDemogprahy.resident_type,
+        resident_civilstatus:
+          civilStatus.length > 0
+            ? civilStatus
+            : residentDemogprahy.resident_civilstatus,
+        resident_purok:
+          purok.length > 0 ? purok : residentDemogprahy.resident_purok,
         resident_id: residentID,
       })
       .then((res: any) => {
