@@ -149,7 +149,7 @@ function App() {
       </div>
 
       <div className="flex gap-10 justify-around my-4">
-        <div className="flex w-[70%] p-2 mt-[2rem] gap-[1rem] ">
+        <div className="flex w-[70%] p-2 mt-[2rem] gap-[1rem] bg-pink-500 rounded-lg text-white">
           <div className="flex items-center ">
             <PieChart
               series={[
@@ -172,7 +172,7 @@ function App() {
           <div className="w-full">
             <h1 className="font-bold text-2xl mb-2">PIE CHART FOR GENDER</h1>
 
-            <div className="cursor-pointer text-start justify-between flex items-center font-bold h-[4rem] p-2 bg-pink-100 w-full rounded-lg px-2">
+            <div className="cursor-pointer text-start justify-between flex items-center font-bold h-[4rem] p-2 bg-white text-black w-full rounded-lg px-2">
               <h1 className="flex item-center">
                 <span className="text-[#5d383a] mr-2 text-xl">
                   {residents.length}
@@ -195,9 +195,9 @@ function App() {
           </div>
         </div>
 
-        <div className="w-[40%]">
-          <Table className="border-2">
-            <TableHeader className="bg-pink-500 ">
+        <div className="w-[40%] bg-pink-500  text-white rounded-2xl">
+          <Table>
+            <TableHeader>
               <TableRow>
                 <TableHead className="text-white">Purok/Zone</TableHead>
                 <TableHead className="text-white">Population</TableHead>
@@ -221,8 +221,8 @@ function App() {
         </div>
       </div>
 
-      <div className="flex">
-        <div className="text-2xl p-5 w-[70%] bg-pink-50 h-fit rounded-lg">
+      <div className="flex h-full gap-2 items-center">
+        <div className="text-2xl p-5 w-[70%] bg-pink-500 rounded-lg text-white h-full">
           <div>
             <Label>Barangay Captaion</Label>
             <p className="font-bold">{barangayCaptain}</p>
@@ -259,7 +259,7 @@ function App() {
               height={300}
             />
           </div>
-          <div className="w-full">
+          <div className="w-full ">
             <h1 className="font-bold text-2xl mb-2">PIE CHART FOR AGE</h1>
 
             <div className="flex gap-7 mt-[2rem] ">

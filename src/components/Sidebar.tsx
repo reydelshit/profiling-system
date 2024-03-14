@@ -29,16 +29,16 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="relative font-bold w-[20rem] h-screen flex flex-col items-center border-r-2 bg-pink-300 py-[2rem]">
-      <div className="text-center w-ful text-white rounded-md">
+    <div className="relative font-bold w-[25rem] h-screen flex flex-col items-center border-r-2 bg-pink-500 py-[2rem]  px-4">
+      <div className="text-center w-full text-white rounded-md bg-pink-300 p-2 my-5">
         <h2 className="text-3xl">{barangayName}</h2>
         <p className="font-normal">{barangayAddress}</p>
       </div>
 
-      <div className="mt-[15rem] w-full px-4">
+      <div className="mt-[15rem] w-full ">
         <Link
-          className={`p-2 mb-2 flex items-center gap-2  ${
-            currentPath === '/' ? 'bg-red-500 rounded-md text-white' : ''
+          className={`p-2 mb-2 flex items-center gap-2 text-white ${
+            currentPath === '/' ? 'bg-pink-300 text-black rounded-md ' : ''
           }`}
           to="/"
         >
@@ -46,9 +46,9 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          className={`p-2 mb-2 flex items-center gap-2  ${
+          className={`p-2 mb-2 flex items-center gap-2 text-white  ${
             currentPath === '/manage-resident'
-              ? 'bg-red-500 rounded-md text-white'
+              ? 'bg-pink-300 text-black rounded-md '
               : ''
           }`}
           to="/manage-resident"
@@ -57,9 +57,9 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          className={`p-2 mb-2 flex items-center gap-2  ${
+          className={`p-2 mb-2 flex items-center gap-2  text-white ${
             currentPath === '/manage-household'
-              ? 'bg-red-500 rounded-md text-white'
+              ? 'bg-pink-300 text-black rounded-md '
               : ''
           }`}
           to="/manage-household"
@@ -68,9 +68,9 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          className={`p-2 mb-2 flex items-center gap-2  ${
+          className={`p-2 mb-2 flex items-center gap-2 text-white ${
             currentPath === '/settings'
-              ? 'bg-red-500 rounded-md text-white'
+              ? 'bg-pink-300 text-black rounded-md '
               : ''
           }`}
           to="/settings"

@@ -48,7 +48,7 @@ export default function Clearance() {
   };
 
   return (
-    <div>
+    <div className="px-[5rem]">
       <h1 className="text-4xl my-10">CLEARANCE</h1>
 
       <div id="household-table">
@@ -58,7 +58,7 @@ export default function Clearance() {
           onChange={(e) => setSearchClearance(e.target.value)}
         />
         <Table className="border-2">
-          <TableHeader className="bg-violet-500 ">
+          <TableHeader className="bg-pink-500 ">
             <TableRow>
               <TableHead className="text-white text-center">Name</TableHead>
               <TableHead className="text-white text-center">Address</TableHead>
