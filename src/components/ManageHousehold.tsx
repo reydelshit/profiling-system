@@ -1,20 +1,16 @@
-import AddResident from './manage-resident/AddResident';
-import { Button } from './ui/button';
-import { useState } from 'react';
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
 import axios from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Button } from './ui/button';
 import { Input } from './ui/input';
 
-import moment from 'moment';
 import AddHousehold from './manage-household/AddHousehold';
 import UpdateHousehold from './manage-household/UpdateHousehold';
 
@@ -81,11 +77,11 @@ export default function ManageHousehold() {
   };
 
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-full relative px-[5rem]">
       <h1 className="text-4xl my-10">MANAGE HOUSEHOLD</h1>
 
       <div className="w-[100%] flex justify-center items-center mt-[2rem]">
-        <div className="w-[80%] mt-[5rem] flex flex-col">
+        <div className="w-[90%] mt-[5rem] flex flex-col">
           <div className="w-full flex justify-between my-2">
             <Button onClick={() => setShowAddHousehold(!showAddHousehold)}>
               New Household
@@ -102,7 +98,7 @@ export default function ManageHousehold() {
           </div>
           <div id="household-table">
             <Table className="border-2">
-              <TableHeader className="bg-violet-500 ">
+              <TableHeader className="bg-pink-500 ">
                 <TableRow>
                   <TableHead className="text-white text-center">
                     Number of Person in Household

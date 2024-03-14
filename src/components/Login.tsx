@@ -1,46 +1,91 @@
+import axios from 'axios';
 import React, { useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+
+type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
 export default function Login() {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const defaultUsername = 'admin';
-  const defaultPassword = 'admin';
+
+  const profiling_token = localStorage.getItem('profiling_token');
+
+  if (profiling_token) {
+    return <Navigate to="/" replace={true} />;
+  }
+
+  const [errorInput, setErrorInput] = useState<string>('');
+
+  const [credentials, setCredentials] = useState([]);
+
+  const handleChange = (e: ChangeEvent) => {
+    const { name, value } = e.target;
+
+    setUsername(value);
+    setPassword(value);
+
+    setCredentials((values) => ({ ...values, [name]: value }));
+
+    console.log(credentials);
+  };
 
   const handleLogin = () => {
-    if (username !== defaultUsername || password !== defaultPassword) {
-      return alert('Invalid username or password');
-    } else {
-      window.location.href = '/';
-      localStorage.setItem('isLogin', 'true');
-    }
+    if (!username || !password)
+      return setErrorInput('Please fill in all fields');
+
+    axios
+      .get(`${import.meta.env.VITE_CMHS_LOCAL_HOST}/login.php`, {
+        params: credentials,
+      })
+      .then((res) => {
+        console.log(res.data);
+        if (res.data) {
+          localStorage.setItem('profiling_token', res.data[0].user_id);
+          window.location.href = '/';
+        }
+      });
   };
+
   return (
     <div className="flex flex-col items-center justify-center h-screen">
       <div className="flex flex-col items-center justify-center gap-2">
-        <h1 className="text-3xl font-bold">
-          Welcome to Barangay Management System
+        <h1 className="mb-[7rem] font-semibold text-3xl">
+          BARANGAY GLAMANG PROFILING SYSTEM
         </h1>
-        <p className="text-lg">Please login to continue</p>
-      </div>
-      <div className="flex flex-col items-center justify-center gap-2 mt-5">
-        <input
-          onChange={(e) => setUsername(e.target.value)}
-          type="text"
+        {/* <Label className="mb-1 self-start text-sm">Username</Label> */}
+        <Input
+          onChange={handleChange}
+          className="mb-8 border-4 text-2xl border-primary-yellow rounded-full p-8 w-full text-primary-yellow focus:outline-none placeholder:text-primary-yellow placeholder:text-2xl placeholder:font-semibold"
           placeholder="Username"
-          className="p-2 border-2 rounded-md outline-none"
+          name="username"
+          required
         />
-        <input
-          onChange={(e) => setPassword(e.target.value)}
+
+        {/* <Label className="mb-1 self-start text-sm">Password</Label> */}
+        <Input
+          className="mb-2 border-4 text-2xl border-primary-yellow rounded-full p-8 w-full text-primary-yellow focus:outline-none placeholder:text-primary-yellow placeholder:text-2xl placeholder:font-semibold"
           type="password"
+          onChange={handleChange}
+          name="password"
           placeholder="Password"
-          className="p-2 border-2 rounded-md outline-none"
+          required
         />
-        <button
-          onClick={handleLogin}
-          className="p-2 bg-violet-600 text-white rounded-md"
-        >
+
+        <div className="w-full text-end px-2">
+          <a href="/register" className="text-[1.2rem] underline">
+            Create an account
+          </a>
+        </div>
+        <Button className="w-[8rem] p-[2rem] text-2xl" onClick={handleLogin}>
           Login
-        </button>
+        </Button>
+        {errorInput && (
+          <p className="text-primary-red border-2 bg-white p-2 rounded-md font-semibold">
+            {errorInput}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -1,24 +1,22 @@
-import AddResident from './manage-resident/AddResident';
-import { Button } from './ui/button';
-import { useState } from 'react';
+import DefaultProfile from '@/assets/default.jpg';
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import axios from 'axios';
-import { useEffect } from 'react';
-import { Input } from './ui/input';
-import UpdateResident from './manage-resident/UpdateResident';
-import DefaultProfile from '@/assets/default.jpg';
-import { Link } from 'react-router-dom';
-import { Label } from './ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import axios from 'axios';
 import moment from 'moment';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import AddResident from './manage-resident/AddResident';
+import UpdateResident from './manage-resident/UpdateResident';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 
 type Resident = {
   resident_id: number;
@@ -159,11 +157,11 @@ export default function ManageResident() {
   };
 
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-full relative px-[5rem]">
       <h1 className="text-4xl my-10">MANAGE RESIDENT</h1>
 
       <div className="w-[100%] flex justify-center items-center mt-[2rem]">
-        <div className="w-[80%] mt-[5rem] flex flex-col">
+        <div className="w-[90%] mt-[5rem] flex flex-col">
           <div className="w-full flex justify-between my-2">
             <div className="flex gap-2">
               <Button onClick={() => setShowAddResident(!showAddResident)}>
@@ -186,7 +184,7 @@ export default function ManageResident() {
             </div>
           </div>
           <Table className="border-2">
-            <TableHeader className="bg-violet-500 ">
+            <TableHeader className="bg-pink-500 ">
               <TableRow>
                 <TableHead className="text-white"></TableHead>
 

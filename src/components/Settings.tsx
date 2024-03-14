@@ -1,8 +1,8 @@
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Button } from './ui/button';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
 
 export default function Settings() {
   const [barangayCaptain, setBarangayCaptain] = useState<string>('');

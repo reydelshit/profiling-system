@@ -1,8 +1,7 @@
-import { useParams } from 'react-router-dom';
-import { useState } from 'react';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Label } from './ui/label';
-import { useEffect } from 'react';
 
 type Resident = {
   resident_id: number;
@@ -50,7 +49,7 @@ export default function ManageResidentView() {
   }, []);
 
   return (
-    <div>
+    <div className="px-[5rem]">
       <h1 className="text-4xl my-10">MANAGE RESIDENT VIEW</h1>
 
       <div>

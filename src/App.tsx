@@ -1,21 +1,11 @@
-import axios from 'axios';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useEffect } from 'react';
 import { PieChart } from '@mui/x-charts/PieChart';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -131,17 +121,19 @@ function App() {
   };
 
   useEffect(() => {
-    getGenderPie();
-    getAgeGroup();
-    fetchResidents();
-    fetchBarangayOfficials();
+    Promise.all([
+      getGenderPie(),
+      getAgeGroup(),
+      fetchResidents(),
+      fetchBarangayOfficials(),
+    ]);
   }, []);
 
   return (
-    <div className="w-full">
+    <div className="w-full px-[5rem]">
       <h1 className="text-4xl my-10">DASHBOARD</h1>
       <div className="flex gap-4 w-full justify-around p-2">
-        <Card className="text-start bg-violet-500 text-white w-full">
+        <Card className="text-start bg-pink-500 text-white w-full">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               TOTAL RESIDENTS
@@ -180,7 +172,7 @@ function App() {
           <div className="w-full">
             <h1 className="font-bold text-2xl mb-2">PIE CHART FOR GENDER</h1>
 
-            <div className="cursor-pointer text-start justify-between flex items-center font-bold h-[4rem] p-2 bg-violet-100 w-full rounded-lg px-2">
+            <div className="cursor-pointer text-start justify-between flex items-center font-bold h-[4rem] p-2 bg-pink-100 w-full rounded-lg px-2">
               <h1 className="flex item-center">
                 <span className="text-[#5d383a] mr-2 text-xl">
                   {residents.length}
@@ -205,7 +197,7 @@ function App() {
 
         <div className="w-[40%]">
           <Table className="border-2">
-            <TableHeader className="bg-violet-500 ">
+            <TableHeader className="bg-pink-500 ">
               <TableRow>
                 <TableHead className="text-white">Purok/Zone</TableHead>
                 <TableHead className="text-white">Population</TableHead>
@@ -230,7 +222,7 @@ function App() {
       </div>
 
       <div className="flex">
-        <div className="text-2xl p-5 w-[70%] bg-violet-50 h-fit rounded-lg">
+        <div className="text-2xl p-5 w-[70%] bg-pink-50 h-fit rounded-lg">
           <div>
             <Label>Barangay Captaion</Label>
             <p className="font-bold">{barangayCaptain}</p>

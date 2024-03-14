@@ -1,17 +1,15 @@
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { useState } from 'react';
-import { Input } from './ui/input';
 import axios from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Input } from './ui/input';
 
 type ClearanceType = {
   clearance_id: number;
