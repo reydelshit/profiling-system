@@ -60,28 +60,28 @@ export default function ManageResidentView() {
                 <h1 className="font-bold">Resident Demography</h1>
 
                 <div className="flex gap-2 p-2">
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Firstname</Label>
                     <h1 className="font-semibold">
                       {resident.resident_firstname}
                     </h1>
                   </span>
 
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Middlename</Label>
                     <h1 className="font-semibold">
                       {resident.resident_middlename}
                     </h1>
                   </span>
 
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Lastname</Label>
                     <h1 className="font-semibold">
                       {resident.resident_lastname}
                     </h1>
                   </span>
 
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Extension</Label>
                     <h1 className="font-semibold">
                       {resident.resident_extension}
@@ -90,21 +90,21 @@ export default function ManageResidentView() {
                 </div>
 
                 <div className="flex gap-2 p-2">
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Date of Birth</Label>
                     <h1 className="font-semibold">
                       {resident.resident_birthday}
                     </h1>
                   </span>
 
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Place of Birth</Label>
                     <h1 className="font-semibold">
                       {resident.resident_place_of_birth}
                     </h1>
                   </span>
 
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Nationality</Label>
                     <h1 className="font-semibold">
                       {resident.resident_nationality}
@@ -113,24 +113,24 @@ export default function ManageResidentView() {
                 </div>
 
                 <div className="flex gap-2 p-2">
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Gender</Label>
                     <h1 className="font-semibold">
                       {resident.resident_gender}
                     </h1>
                   </span>
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Religion</Label>
                     <h1 className="font-semibold">
                       {resident.resident_religion}
                     </h1>
                   </span>
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Type (pwd or deceased)</Label>
                     <h1 className="font-semibold">{resident.resident_type}</h1>
                   </span>
 
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Civil Status</Label>
                     <h1 className="font-semibold">
                       {resident.resident_civilstatus}
@@ -139,14 +139,14 @@ export default function ManageResidentView() {
                 </div>
 
                 <div className="flex gap-2 p-2">
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Weight</Label>
                     <h1 className="font-semibold">
                       {resident.resident_weight}
                     </h1>
                   </span>
 
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Height</Label>
                     <h1 className="font-semibold">
                       {resident.resident_height}
@@ -155,14 +155,14 @@ export default function ManageResidentView() {
                 </div>
 
                 <div className="flex gap-2 p-2">
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Father's Name</Label>
                     <h1 className="font-semibold">
                       {resident.resident_father_name}
                     </h1>
                   </span>
 
-                  <span className="block w-full border-2 p-2 rounded-md">
+                  <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                     <Label>Mother's Name</Label>
                     <h1 className="font-semibold">
                       {resident.resident_mother_name}
@@ -174,21 +174,21 @@ export default function ManageResidentView() {
                   <h1 className="font-bold">Resedential Address</h1>
 
                   <div className="flex gap-2 p-2">
-                    <span className="block w-full border-2 p-2 rounded-md">
+                    <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                       <Label>Houseno</Label>
                       <h1 className="font-semibold">
                         {resident.resident_houseno}
                       </h1>
                     </span>
 
-                    <span className="block w-full border-2 p-2 rounded-md">
+                    <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                       <Label>Purok</Label>
                       <h1 className="font-semibold">
                         {resident.resident_purok}
                       </h1>
                     </span>
 
-                    <span className="block w-full border-2 p-2 rounded-md">
+                    <span className="block w-full border-2 p-2 rounded-md bg-pink-500 text-white">
                       <Label>Address</Label>
                       <h1 className="font-semibold">
                         {resident.resident_address}
