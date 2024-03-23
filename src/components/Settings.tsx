@@ -1,4 +1,5 @@
 import axios from 'axios';
+import CryptoJS from 'crypto-js';
 import { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -13,27 +14,44 @@ export default function Settings() {
 
   const [barangayName, setBarangayName] = useState<string>('');
   const [barangayAddress, setBarangayAddress] = useState<string>('');
-  const user_id = localStorage.getItem('profiling_token');
-  const fetchBarangayOfficials = () => {
-    axios
+  const secretKey = 'your_secret_key';
+
+  const [user_id, setUserId] = useState<string>('');
+  const decrypt = () => {
+    const user_id = localStorage.getItem('profiling_token') as string;
+    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
+    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+
+    console.log(plaintext);
+    setUserId(plaintext);
+
+    fetchBarangayOfficials(plaintext);
+    fetchBarangayDetails(plaintext);
+  };
+
+  const fetchBarangayOfficials = async (user_id: string) => {
+    if (user_id === '') return;
+    await axios
       .get(`${import.meta.env.VITE_PROFILING}/officials.php`, {
         params: { user_id: user_id },
       })
       .then((res) => {
         console.log(res.data);
         setBarangayOfficials(res.data);
-
-        if (res.data[0].official_type === 'Barangay Captain')
-          setBarangayCaptain(res.data[0].official_name);
-        if (res.data[1].official_type === 'Barangay Secretary')
-          setBarangaySecretary(res.data[1].official_name);
-        if (res.data[2].official_type === 'Barangay Treasurer')
-          setBarangayTreasurer(res.data[2].official_name);
+        res.data.forEach((official: any) => {
+          if (official.official_type === 'Barangay Captain') {
+            setBarangayCaptain(official.official_name);
+          } else if (official.official_type === 'Barangay Secretary')
+            setBarangaySecretary(official.official_name);
+          else if (official.official_type === 'Barangay Treasurer')
+            setBarangayTreasurer(official.official_name);
+        });
       });
   };
 
-  const fetchBarangayDetails = () => {
-    axios
+  const fetchBarangayDetails = async (user_id: string) => {
+    if (user_id === '') return;
+    await axios
       .get(`${import.meta.env.VITE_PROFILING}/barangaydetails.php`, {
         params: { user_id: user_id },
       })
@@ -42,13 +60,16 @@ export default function Settings() {
         if (res.data.length > 0) {
           setBarangayName(res.data[0].barangay_name);
           setBarangayAddress(res.data[0].barangay_address);
+        } else {
+          console.log('No data found');
         }
       });
   };
 
   useEffect(() => {
-    fetchBarangayOfficials();
-    fetchBarangayDetails();
+    decrypt();
+
+    // Promise.all([fetchBarangayOfficials(), fetchBarangayDetails()]);
   }, []);
 
   const handleSubmitCaptain = () => {

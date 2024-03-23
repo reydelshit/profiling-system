@@ -21,8 +21,10 @@ type Household = {
 
 export default function AddResident({
   setShowAddResident,
+  user_id,
 }: {
   setShowAddResident: (value: boolean) => void;
+  user_id: string;
 }) {
   const [image, setImage] = useState<string | null>(null);
   const [residentGender, setResidentGender] = useState<string>('');
@@ -50,7 +52,6 @@ export default function AddResident({
 
   const [household, setHousehold] = useState<Household[]>([]);
 
-  const user_id = localStorage.getItem('profiling_token');
   const fetchHousehold = async () => {
     axios
       .get(`${import.meta.env.VITE_PROFILING}/household.php`, {

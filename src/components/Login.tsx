@@ -3,15 +3,18 @@ import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import CryptoJS from 'crypto-js';
 
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
 export default function Login() {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [encryptedData, setEncryptedData] = useState('');
+  const [decryptedData, setDecryptedData] = useState('');
 
   const profiling_token = localStorage.getItem('profiling_token');
-
+  const secretKey = 'your_secret_key';
   if (profiling_token) {
     return <Navigate to="/" replace={true} />;
   }
@@ -37,17 +40,31 @@ export default function Login() {
 
     axios
       .get(`${import.meta.env.VITE_PROFILING}/login.php`, {
-        params: credentials,
+        params: {
+          username: username,
+          password: password,
+        },
       })
       .then((res) => {
         console.log(res.data);
-        localStorage.setItem('profiling_token', res.data[0].user_id);
+        // localStorage.setItem('profiling_token', res.data[0].user_id);
+        encrypt(res.data[0].user_id.toString());
+        localStorage.setItem('profiling_reauth', '0');
+
         window.location.href = '/';
       })
       .catch((error) => {
         console.error('Error occurred during login:', error);
       });
   };
+
+  const encrypt = (encrypt: string) => {
+    const ciphertext = CryptoJS.AES.encrypt(encrypt, secretKey).toString();
+    setEncryptedData(ciphertext);
+
+    localStorage.setItem('profiling_token', ciphertext);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center h-screen">
       <div className="flex flex-col items-center justify-center gap-2">

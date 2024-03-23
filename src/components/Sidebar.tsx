@@ -2,15 +2,25 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
+import CryptoJS from 'crypto-js';
 
 export default function Sidebar() {
   const [barangayName, setBarangayName] = useState<string>('');
   const [barangayAddress, setBarangayAddress] = useState<string>('');
 
   const currentPath = useLocation().pathname;
-  const user_id = localStorage.getItem('profiling_token');
 
-  const fetchBarangayDetails = async () => {
+  const secretKey = 'your_secret_key';
+
+  const decrypt = () => {
+    const user_id = localStorage.getItem('profiling_token') as string;
+    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
+    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+
+    fetchBarangayDetails(plaintext);
+  };
+
+  const fetchBarangayDetails = async (user_id: string) => {
     console.log(user_id);
 
     await axios
@@ -31,11 +41,12 @@ export default function Sidebar() {
   };
 
   useEffect(() => {
-    fetchBarangayDetails();
+    decrypt();
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('profiling_token');
+    localStorage.removeItem('profiling_reauth');
     window.location.href = '/login';
   };
 

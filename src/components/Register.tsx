@@ -1,10 +1,9 @@
 import { Input } from '@/components/ui/input';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import PasswordStrengthBar from 'react-password-strength-bar';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
-import PasswordStrengthBar from 'react-password-strength-bar';
-
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
 export default function Register() {
@@ -21,6 +20,7 @@ export default function Register() {
   const [seconds, setSeconds] = useState(5);
   const [credentials, setCredentials] = useState([]);
   const navigate = useNavigate();
+
   const handleChange = (e: ChangeEvent) => {
     const { name, value } = e.target;
 

@@ -17,6 +17,7 @@ import UpdateResident from './manage-resident/UpdateResident';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import CryptoJS from 'crypto-js';
 
 type Resident = {
   resident_id: number;
@@ -63,8 +64,21 @@ export default function ManageResident() {
   const [residentIssuedDate, setResidentIssuedDate] = useState<string>('');
   const [residentValidUntil, setResidentValidUntil] = useState<string>('');
 
-  const user_id = localStorage.getItem('profiling_token');
-  const fetchResidents = async () => {
+  const secretKey = 'your_secret_key';
+
+  const [user_id, setUserId] = useState<string>('');
+  const decrypt = () => {
+    const user_id = localStorage.getItem('profiling_token') as string;
+    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
+    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+
+    console.log(plaintext);
+    setUserId(plaintext);
+
+    fetchResidents(plaintext);
+  };
+
+  const fetchResidents = async (user_id: string) => {
     await axios
       .get(`${import.meta.env.VITE_PROFILING}/resident.php`, {
         params: { user_id: user_id },
@@ -99,7 +113,7 @@ export default function ManageResident() {
   };
 
   useEffect(() => {
-    fetchResidents();
+    decrypt();
   }, []);
 
   const handleDeleteResident = (id: number) => {
@@ -110,7 +124,7 @@ export default function ManageResident() {
       })
       .then((res) => {
         console.log(res.data);
-        fetchResidents();
+        decrypt();
       });
   };
 
@@ -277,7 +291,10 @@ export default function ManageResident() {
         </div>
       </div>
       {showAddResident && (
-        <AddResident setShowAddResident={setShowAddResident} />
+        <AddResident
+          user_id={user_id}
+          setShowAddResident={setShowAddResident}
+        />
       )}
 
       {showUpdateForm && (

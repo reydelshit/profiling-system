@@ -13,8 +13,10 @@ import { Input } from '../ui/input';
 
 export default function AddHousehold({
   setShowAddHousehold,
+  user_id,
 }: {
   setShowAddHousehold: (value: boolean) => void;
+  user_id: string;
 }) {
   const [purok, setPurok] = useState<string>('');
   const [houseNo, setHouseNo] = useState<string>('');
@@ -30,7 +32,7 @@ export default function AddHousehold({
         house_no: houseNo,
         house_purok: purok,
         house_address: address,
-        user_id: localStorage.getItem('profiling_token'),
+        user_id: user_id,
       })
       .then((res: any) => {
         console.log(res.data);

@@ -1,6 +1,7 @@
 import { PieChart } from '@mui/x-charts/PieChart';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import CryptoJS from 'crypto-js';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -46,11 +47,26 @@ function App() {
   const [barangayCaptain, setBarangayCaptain] = useState<string>('');
   const [barangaySecretary, setBarangaySecretary] = useState<string>('');
   const [barangayTreasurer, setBarangayTreasurer] = useState<string>('');
+  const secretKey = 'your_secret_key';
 
-  const fetchResidents = async () => {
+  const [user_id, setUserId] = useState<string>('');
+  const decrypt = () => {
+    const user_id = localStorage.getItem('profiling_token') as string;
+    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
+    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+
+    console.log(plaintext);
+    setUserId(plaintext);
+
+    fetchBarangayOfficials(plaintext);
+    fetchResidents(plaintext);
+    getGenderPie(plaintext), getAgeGroup(plaintext);
+  };
+
+  const fetchResidents = async (user_id: string) => {
     axios
       .get(`${import.meta.env.VITE_PROFILING}/resident.php`, {
-        params: { user_id: localStorage.getItem('profiling_token') },
+        params: { user_id: user_id },
       })
       .then((res) => {
         console.log(res.data);
@@ -58,24 +74,30 @@ function App() {
       });
   };
 
-  const fetchBarangayOfficials = () => {
-    axios.get(`${import.meta.env.VITE_PROFILING}/officials.php`).then((res) => {
-      console.log(res.data);
+  const fetchBarangayOfficials = (user_id: string) => {
+    axios
+      .get(`${import.meta.env.VITE_PROFILING}/officials.php`, {
+        params: { user_id: user_id },
+      })
+      .then((res) => {
+        console.log(res.data);
 
-      if (res.data.length > 0) {
-        if (res.data[0].official_type === 'Barangay Captain')
-          setBarangayCaptain(res.data[0].official_name);
-        if (res.data[1].official_type === 'Barangay Secretary')
-          setBarangaySecretary(res.data[1].official_name);
-        if (res.data[2].official_type === 'Barangay Treasurer')
-          setBarangayTreasurer(res.data[2].official_name);
-      }
-    });
+        if (res.data.length > 0) {
+          if (res.data[0].official_type === 'Barangay Captain')
+            setBarangayCaptain(res.data[0].official_name);
+          if (res.data[1].official_type === 'Barangay Secretary')
+            setBarangaySecretary(res.data[1].official_name);
+          if (res.data[2].official_type === 'Barangay Treasurer')
+            setBarangayTreasurer(res.data[2].official_name);
+        }
+      });
   };
 
-  const getGenderPie = () => {
+  const getGenderPie = (user_id: string) => {
     axios
-      .get(`${import.meta.env.VITE_PROFILING}/pie-chart-gender.php`)
+      .get(`${import.meta.env.VITE_PROFILING}/pie-chart-gender.php`, {
+        params: { user_id: user_id },
+      })
       .then((res) => {
         console.log(res.data, 'gender');
         const gender = res.data.map(
@@ -99,9 +121,11 @@ function App() {
       });
   };
 
-  const getAgeGroup = () => {
+  const getAgeGroup = (user_id: string) => {
     axios
-      .get(`${import.meta.env.VITE_PROFILING}/pie-chart-age.php`)
+      .get(`${import.meta.env.VITE_PROFILING}/pie-chart-age.php`, {
+        params: { user_id: user_id },
+      })
       .then((res) => {
         const age = res.data.map(
           (stat: { count: number; age_group: string }, index: number) => {
@@ -127,12 +151,7 @@ function App() {
   };
 
   useEffect(() => {
-    Promise.all([
-      getGenderPie(),
-      getAgeGroup(),
-      fetchResidents(),
-      fetchBarangayOfficials(),
-    ]);
+    decrypt();
   }, []);
 
   return (

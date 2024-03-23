@@ -10,6 +10,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import CryptoJS from 'crypto-js';
 
 import AddHousehold from './manage-household/AddHousehold';
 import UpdateHousehold from './manage-household/UpdateHousehold';
@@ -29,8 +30,20 @@ export default function ManageHousehold() {
   const [householdId, setHouseholdId] = useState<number>(0);
   const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
 
-  const user_id = localStorage.getItem('profiling_token');
-  const fetchHousehold = async () => {
+  const secretKey = 'your_secret_key';
+  const [user_id, setUserId] = useState<string>('');
+
+  const decrypt = () => {
+    const user_id = localStorage.getItem('profiling_token') as string;
+    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
+    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+
+    console.log(plaintext);
+    setUserId(plaintext);
+    fetchHousehold(plaintext);
+  };
+
+  const fetchHousehold = async (user_id: string) => {
     axios
       .get(`${import.meta.env.VITE_PROFILING}/household.php`, {
         params: { user_id: user_id },
@@ -42,7 +55,7 @@ export default function ManageHousehold() {
   };
 
   useEffect(() => {
-    fetchHousehold();
+    decrypt();
   }, []);
 
   const handleDeleteHousehold = (id: number) => {
@@ -53,7 +66,7 @@ export default function ManageHousehold() {
       })
       .then((res) => {
         console.log(res.data);
-        fetchHousehold();
+        decrypt();
       });
   };
 
@@ -164,7 +177,10 @@ export default function ManageHousehold() {
         </div>
       </div>
       {showAddHousehold && (
-        <AddHousehold setShowAddHousehold={setShowAddHousehold} />
+        <AddHousehold
+          user_id={user_id}
+          setShowAddHousehold={setShowAddHousehold}
+        />
       )}
 
       {showUpdateForm && (
