@@ -14,7 +14,7 @@ import CryptoJS from 'crypto-js';
 
 import AddHousehold from './manage-household/AddHousehold';
 import UpdateHousehold from './manage-household/UpdateHousehold';
-
+import { useNavigate } from 'react-router-dom';
 type Household = {
   house_id: number;
   house_no: string;
@@ -32,6 +32,7 @@ export default function ManageHousehold() {
 
   const secretKey = 'your_secret_key';
   const [user_id, setUserId] = useState<string>('');
+  const navigate = useNavigate();
 
   const decrypt = () => {
     const user_id = localStorage.getItem('profiling_token') as string;
@@ -59,15 +60,23 @@ export default function ManageHousehold() {
   }, []);
 
   const handleDeleteHousehold = (id: number) => {
-    console.log(id);
-    axios
-      .delete(`${import.meta.env.VITE_PROFILING}/household.php`, {
-        data: { house_id: id },
-      })
-      .then((res) => {
-        console.log(res.data);
-        decrypt();
-      });
+    const reauthToken = localStorage.getItem('profiling_reauth');
+
+    if (reauthToken === '0') {
+      navigate('/login', { replace: true });
+
+      // console.log(id);
+      // axios
+      //   .delete(`${import.meta.env.VITE_PROFILING}/household.php`, {
+      //     data: { house_id: id },
+      //   })
+      //   .then((res) => {
+      //     console.log(res.data);
+      //     decrypt();
+      //   });
+
+      localStorage.setItem('profiling_reauth', '1');
+    }
   };
 
   const handleShowUpdateForm = (id: number) => {
