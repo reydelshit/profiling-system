@@ -48,22 +48,28 @@ function App() {
   const [barangayTreasurer, setBarangayTreasurer] = useState<string>('');
 
   const fetchResidents = async () => {
-    axios.get(`${import.meta.env.VITE_PROFILING}/resident.php`).then((res) => {
-      console.log(res.data);
-      setResidents(res.data);
-    });
+    axios
+      .get(`${import.meta.env.VITE_PROFILING}/resident.php`, {
+        params: { user_id: localStorage.getItem('profiling_token') },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setResidents(res.data);
+      });
   };
 
   const fetchBarangayOfficials = () => {
     axios.get(`${import.meta.env.VITE_PROFILING}/officials.php`).then((res) => {
       console.log(res.data);
 
-      if (res.data[0].official_type === 'Barangay Captain')
-        setBarangayCaptain(res.data[0].official_name);
-      if (res.data[1].official_type === 'Barangay Secretary')
-        setBarangaySecretary(res.data[1].official_name);
-      if (res.data[2].official_type === 'Barangay Treasurer')
-        setBarangayTreasurer(res.data[2].official_name);
+      if (res.data.length > 0) {
+        if (res.data[0].official_type === 'Barangay Captain')
+          setBarangayCaptain(res.data[0].official_name);
+        if (res.data[1].official_type === 'Barangay Secretary')
+          setBarangaySecretary(res.data[1].official_name);
+        if (res.data[2].official_type === 'Barangay Treasurer')
+          setBarangayTreasurer(res.data[2].official_name);
+      }
     });
   };
 

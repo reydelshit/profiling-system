@@ -8,14 +8,25 @@ export default function Sidebar() {
   const [barangayAddress, setBarangayAddress] = useState<string>('');
 
   const currentPath = useLocation().pathname;
+  const user_id = localStorage.getItem('profiling_token');
 
-  const fetchBarangayDetails = () => {
-    axios
-      .get(`${import.meta.env.VITE_PROFILING}/barangaydetails.php`)
+  const fetchBarangayDetails = async () => {
+    console.log(user_id);
+
+    await axios
+      .get(`${import.meta.env.VITE_PROFILING}/barangaydetails.php`, {
+        params: {
+          user_id: user_id,
+        },
+      })
       .then((res) => {
         console.log(res.data);
-        setBarangayName(res.data[0].barangay_name);
-        setBarangayAddress(res.data[0].barangay_address);
+        if (res.data.length > 0) {
+          setBarangayName(res.data[0].barangay_name);
+          setBarangayAddress(res.data[0].barangay_address);
+        } else {
+          console.log('No data found');
+        }
       });
   };
 
@@ -31,8 +42,12 @@ export default function Sidebar() {
   return (
     <div className="relative font-bold w-[25rem] h-screen flex flex-col items-center border-r-2 bg-pink-500 py-[2rem]  px-4">
       <div className="text-center w-full text-white rounded-md bg-pink-300 p-2 my-5">
-        <h2 className="text-3xl">{barangayName}</h2>
-        <p className="font-normal">{barangayAddress}</p>
+        <h2 className="text-3xl">
+          {barangayName.length > 0 ? barangayName : 'No Barangay Name'}
+        </h2>
+        <p className="font-normal">
+          {barangayAddress.length > 0 ? barangayAddress : 'No Barangay Address'}
+        </p>
       </div>
 
       <div className="mt-[15rem] w-full ">

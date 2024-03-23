@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
+import PasswordStrengthBar from 'react-password-strength-bar';
 
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
@@ -36,7 +37,7 @@ export default function Register() {
       return setErrorInput('Please fill in all fields');
 
     axios
-      .post(`${import.meta.env.VITE_CMHS_LOCAL_HOST}/login.php`, {
+      .post(`${import.meta.env.VITE_PROFILING}/login.php`, {
         ...credentials,
       })
       .then((res: any) => {
@@ -78,7 +79,7 @@ export default function Register() {
     <div className="flex flex-col items-center justify-center h-screen">
       <div className="bg-primary-red text-primary-yellow shadow-slate-400 w-[40%] px-[5rem] h-full flex justify-center items-center flex-col p-4 rounded-md">
         <div className="flex justify-start items-start w-full my-[2rem]">
-          <Button>Go back</Button>
+          <Button onClick={() => navigate('/')}>Go back</Button>
         </div>
 
         <h1 className="mb-[5rem] font-semibold text-3xl">
@@ -89,7 +90,7 @@ export default function Register() {
           onChange={handleChange}
           className="mb-8 border-4 text-2xl border-primary-yellow rounded-full p-8 w-full text-primary-yellow focus:outline-none placeholder:text-primary-yellow placeholder:text-2xl placeholder:font-semibold"
           placeholder="Fullname"
-          name="name"
+          name="fullname"
           required
         />
         <Input
@@ -123,6 +124,8 @@ export default function Register() {
             {errorInput}
           </p>
         )}
+
+        <PasswordStrengthBar className="w-full my-4" password={password} />
 
         <Button className="w-[8rem] p-[2rem] text-2xl" onClick={handleRegister}>
           Register

@@ -50,11 +50,16 @@ export default function AddResident({
 
   const [household, setHousehold] = useState<Household[]>([]);
 
+  const user_id = localStorage.getItem('profiling_token');
   const fetchHousehold = async () => {
-    axios.get(`${import.meta.env.VITE_PROFILING}/household.php`).then((res) => {
-      console.log(res.data);
-      setHousehold(res.data);
-    });
+    axios
+      .get(`${import.meta.env.VITE_PROFILING}/household.php`, {
+        params: { user_id: user_id },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setHousehold(res.data);
+      });
   };
 
   useEffect(() => {
@@ -80,6 +85,7 @@ export default function AddResident({
         resident_civilstatus: civilStatus,
         resident_purok: purok,
         resident_houseno: householdName,
+        user_id: user_id,
       })
       .then((res: any) => {
         console.log(res.data);

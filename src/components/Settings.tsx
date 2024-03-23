@@ -13,28 +13,36 @@ export default function Settings() {
 
   const [barangayName, setBarangayName] = useState<string>('');
   const [barangayAddress, setBarangayAddress] = useState<string>('');
-
+  const user_id = localStorage.getItem('profiling_token');
   const fetchBarangayOfficials = () => {
-    axios.get(`${import.meta.env.VITE_PROFILING}/officials.php`).then((res) => {
-      console.log(res.data);
-      setBarangayOfficials(res.data);
+    axios
+      .get(`${import.meta.env.VITE_PROFILING}/officials.php`, {
+        params: { user_id: user_id },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setBarangayOfficials(res.data);
 
-      if (res.data[0].official_type === 'Barangay Captain')
-        setBarangayCaptain(res.data[0].official_name);
-      if (res.data[1].official_type === 'Barangay Secretary')
-        setBarangaySecretary(res.data[1].official_name);
-      if (res.data[2].official_type === 'Barangay Treasurer')
-        setBarangayTreasurer(res.data[2].official_name);
-    });
+        if (res.data[0].official_type === 'Barangay Captain')
+          setBarangayCaptain(res.data[0].official_name);
+        if (res.data[1].official_type === 'Barangay Secretary')
+          setBarangaySecretary(res.data[1].official_name);
+        if (res.data[2].official_type === 'Barangay Treasurer')
+          setBarangayTreasurer(res.data[2].official_name);
+      });
   };
 
   const fetchBarangayDetails = () => {
     axios
-      .get(`${import.meta.env.VITE_PROFILING}/barangaydetails.php`)
+      .get(`${import.meta.env.VITE_PROFILING}/barangaydetails.php`, {
+        params: { user_id: user_id },
+      })
       .then((res) => {
         console.log(res.data);
-        setBarangayName(res.data[0].barangay_name);
-        setBarangayAddress(res.data[0].barangay_address);
+        if (res.data.length > 0) {
+          setBarangayName(res.data[0].barangay_name);
+          setBarangayAddress(res.data[0].barangay_address);
+        }
       });
   };
 
@@ -48,6 +56,7 @@ export default function Settings() {
       .post(`${import.meta.env.VITE_PROFILING}/officials.php`, {
         official_type: 'Barangay Captain',
         official_name: barangayCaptain,
+        user_id: user_id,
       })
       .then((res: any) => {
         console.log(res.data);
@@ -60,6 +69,7 @@ export default function Settings() {
       .post(`${import.meta.env.VITE_PROFILING}/officials.php`, {
         official_type: 'Barangay Secretary',
         official_name: barangaySecretary,
+        user_id: user_id,
       })
       .then((res: any) => {
         console.log(res.data);
@@ -72,6 +82,7 @@ export default function Settings() {
       .post(`${import.meta.env.VITE_PROFILING}/officials.php`, {
         official_type: 'Barangay Treasurer',
         official_name: barangayTreasurer,
+        user_id: user_id,
       })
       .then((res: any) => {
         console.log(res.data);
@@ -84,6 +95,7 @@ export default function Settings() {
       .post(`${import.meta.env.VITE_PROFILING}/barangaydetails.php`, {
         barangay_name: barangayName,
         barangay_address: barangayAddress,
+        user_id: user_id,
       })
       .then((res: any) => {
         console.log(res.data);

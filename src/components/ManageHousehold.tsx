@@ -29,11 +29,16 @@ export default function ManageHousehold() {
   const [householdId, setHouseholdId] = useState<number>(0);
   const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
 
+  const user_id = localStorage.getItem('profiling_token');
   const fetchHousehold = async () => {
-    axios.get(`${import.meta.env.VITE_PROFILING}/household.php`).then((res) => {
-      console.log(res.data);
-      setHousehold(res.data);
-    });
+    axios
+      .get(`${import.meta.env.VITE_PROFILING}/household.php`, {
+        params: { user_id: user_id },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setHousehold(res.data);
+      });
   };
 
   useEffect(() => {
@@ -119,33 +124,40 @@ export default function ManageHousehold() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {household
-                  .filter((house) => house.house_no.includes(searchHousehold))
-                  .map((house, index) => (
-                    <TableRow className="text-center" key={index}>
-                      <TableCell>{house.resident_count}</TableCell>
-                      <TableCell>{house.house_no}</TableCell>
-                      <TableCell>{house.house_purok}</TableCell>
-                      <TableCell>{house.house_address}</TableCell>
+                {household.length > 0 ? (
+                  household &&
+                  household
+                    .filter((house) => house.house_no.includes(searchHousehold))
+                    .map((house, index) => (
+                      <TableRow className="text-center" key={index}>
+                        <TableCell>{house.resident_count}</TableCell>
+                        <TableCell>{house.house_no}</TableCell>
+                        <TableCell>{house.house_purok}</TableCell>
+                        <TableCell>{house.house_address}</TableCell>
 
-                      <TableCell className="flex justify-center">
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => handleShowUpdateForm(house.house_id)}
-                          >
-                            Update
-                          </Button>
-                          <Button
-                            onClick={() =>
-                              handleDeleteHousehold(house.house_id)
-                            }
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        <TableCell className="flex justify-center">
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={() =>
+                                handleShowUpdateForm(house.house_id)
+                              }
+                            >
+                              Update
+                            </Button>
+                            <Button
+                              onClick={() =>
+                                handleDeleteHousehold(house.house_id)
+                              }
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                ) : (
+                  <TableRow>Household Empty </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>

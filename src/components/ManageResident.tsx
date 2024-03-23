@@ -63,11 +63,16 @@ export default function ManageResident() {
   const [residentIssuedDate, setResidentIssuedDate] = useState<string>('');
   const [residentValidUntil, setResidentValidUntil] = useState<string>('');
 
+  const user_id = localStorage.getItem('profiling_token');
   const fetchResidents = async () => {
-    axios.get(`${import.meta.env.VITE_PROFILING}/resident.php`).then((res) => {
-      console.log(res.data);
-      setResidents(res.data);
-    });
+    await axios
+      .get(`${import.meta.env.VITE_PROFILING}/resident.php`, {
+        params: { user_id: user_id },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setResidents(res.data);
+      });
   };
 
   const fetchResidentSpecific = (id: number) => {
@@ -197,69 +202,76 @@ export default function ManageResident() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {residents
-                .filter(
-                  (resi) =>
-                    resi.resident_lastname.includes(searchResident) ||
-                    resi.resident_firstname.includes(searchResident) ||
-                    resi.resident_middlename.includes(searchResident),
-                )
-                .map((resident, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <img
-                        className="w-[5rem] h-[5rem] object-contain rounded-lg  mb-4"
-                        src={
-                          resident.resident_image!
-                            ? resident.resident_image
-                            : DefaultProfile
-                        }
-                      />
-                    </TableCell>
-
-                    <TableCell>
-                      {resident.resident_firstname +
-                        ' ' +
-                        resident.resident_middlename +
-                        ' ' +
-                        resident.resident_lastname}
-                    </TableCell>
-                    <TableCell>{resident.resident_gender}</TableCell>
-                    <TableCell>{resident.resident_birthday}</TableCell>
-                    <TableCell>{resident.resident_houseno}</TableCell>
-                    <TableCell>{resident.resident_purok}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Link to={`/manage-resident/${resident.resident_id}`}>
-                          <Button> View </Button>
-                        </Link>
-
-                        <Button
-                          onClick={() =>
-                            handleShowUpdateForm(resident.resident_id)
+              {residents && residents.length > 0 ? (
+                residents &&
+                residents
+                  .filter(
+                    (resi) =>
+                      resi.resident_lastname.includes(searchResident) ||
+                      resi.resident_firstname.includes(searchResident) ||
+                      resi.resident_middlename.includes(searchResident),
+                  )
+                  .map((resident, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <img
+                          className="w-[5rem] h-[5rem] object-contain rounded-lg  mb-4"
+                          src={
+                            resident.resident_image!
+                              ? resident.resident_image
+                              : DefaultProfile
                           }
-                        >
-                          Update
-                        </Button>
-                        <Button
-                          onClick={() =>
-                            handleDeleteResident(resident.resident_id)
-                          }
-                        >
-                          Delete
-                        </Button>
+                        />
+                      </TableCell>
 
-                        <Button
-                          onClick={() =>
-                            handleShowClearanceForm(resident.resident_id)
-                          }
-                        >
-                          Issue Clearance
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      <TableCell>
+                        {resident.resident_firstname +
+                          ' ' +
+                          resident.resident_middlename +
+                          ' ' +
+                          resident.resident_lastname}
+                      </TableCell>
+                      <TableCell>{resident.resident_gender}</TableCell>
+                      <TableCell>{resident.resident_birthday}</TableCell>
+                      <TableCell>{resident.resident_houseno}</TableCell>
+                      <TableCell>{resident.resident_purok}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Link to={`/manage-resident/${resident.resident_id}`}>
+                            <Button> View </Button>
+                          </Link>
+
+                          <Button
+                            onClick={() =>
+                              handleShowUpdateForm(resident.resident_id)
+                            }
+                          >
+                            Update
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              handleDeleteResident(resident.resident_id)
+                            }
+                          >
+                            Delete
+                          </Button>
+
+                          <Button
+                            onClick={() =>
+                              handleShowClearanceForm(resident.resident_id)
+                            }
+                          >
+                            Issue Clearance
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+              ) : (
+                <TableRow className="text-center w-full">
+                  Resident is empty
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>

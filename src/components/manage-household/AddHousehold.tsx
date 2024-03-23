@@ -30,6 +30,7 @@ export default function AddHousehold({
         house_no: houseNo,
         house_purok: purok,
         house_address: address,
+        user_id: localStorage.getItem('profiling_token'),
       })
       .then((res: any) => {
         console.log(res.data);

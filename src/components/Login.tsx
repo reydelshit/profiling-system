@@ -36,18 +36,18 @@ export default function Login() {
       return setErrorInput('Please fill in all fields');
 
     axios
-      .get(`${import.meta.env.VITE_CMHS_LOCAL_HOST}/login.php`, {
+      .get(`${import.meta.env.VITE_PROFILING}/login.php`, {
         params: credentials,
       })
       .then((res) => {
         console.log(res.data);
-        if (res.data) {
-          localStorage.setItem('profiling_token', res.data[0].user_id);
-          window.location.href = '/';
-        }
+        localStorage.setItem('profiling_token', res.data[0].user_id);
+        window.location.href = '/';
+      })
+      .catch((error) => {
+        console.error('Error occurred during login:', error);
       });
   };
-
   return (
     <div className="flex flex-col items-center justify-center h-screen">
       <div className="flex flex-col items-center justify-center gap-2">
