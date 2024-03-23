@@ -10,29 +10,36 @@ import {
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Input } from './ui/input';
+import CryptoJS from 'crypto-js';
+import { ClearanceType } from '@/entities/types';
 
-type ClearanceType = {
-  clearance_id: number;
-  resident_name: string;
-  resident_address: string;
-  resident_birthday: string;
-  resident_purpose: string;
-  resident_issued: string;
-  resident_until: string;
-};
 export default function Clearance() {
   const [searchClearance, setSearchClearance] = useState<string>('');
   const [clearance, setClearance] = useState<ClearanceType[]>([]);
 
-  const fetchClearance = async () => {
-    axios.get(`${import.meta.env.VITE_PROFILING}/clearance.php`).then((res) => {
-      console.log(res.data);
-      setClearance(res.data);
-    });
+  const secretKey = 'your_secret_key';
+
+  const decrypt = () => {
+    const user_id = localStorage.getItem('profiling_token') as string;
+    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
+    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+
+    fetchClearance(plaintext);
+  };
+
+  const fetchClearance = async (user_id: string) => {
+    axios
+      .get(`${import.meta.env.VITE_PROFILING}/clearance.php`, {
+        params: { user_id: user_id },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setClearance(res.data);
+      });
   };
 
   useEffect(() => {
-    fetchClearance();
+    decrypt();
   }, []);
 
   const handleDeleteClearance = (id: number) => {
@@ -43,7 +50,7 @@ export default function Clearance() {
       })
       .then((res) => {
         console.log(res.data);
-        fetchClearance();
+        decrypt();
       });
   };
 

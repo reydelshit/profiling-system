@@ -7,21 +7,15 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import axios from 'axios';
+import CryptoJS from 'crypto-js';
 import { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import CryptoJS from 'crypto-js';
 
+import { Household } from '@/entities/types';
+import VerifyPassword from './VerifyPassword';
 import AddHousehold from './manage-household/AddHousehold';
 import UpdateHousehold from './manage-household/UpdateHousehold';
-import { useNavigate } from 'react-router-dom';
-type Household = {
-  house_id: number;
-  house_no: string;
-  house_purok: string;
-  house_address: string;
-  resident_count: string;
-};
 
 export default function ManageHousehold() {
   const [household, setHousehold] = useState<Household[]>([]);
@@ -29,10 +23,10 @@ export default function ManageHousehold() {
   const [searchHousehold, setSearchHousehold] = useState<string>('');
   const [householdId, setHouseholdId] = useState<number>(0);
   const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
-
+  const [showReauth, setShowReauth] = useState<boolean>(false);
+  const [storeDeleteID, setStoreDeleteID] = useState<number>(0);
   const secretKey = 'your_secret_key';
   const [user_id, setUserId] = useState<string>('');
-  const navigate = useNavigate();
 
   const decrypt = () => {
     const user_id = localStorage.getItem('profiling_token') as string;
@@ -50,7 +44,7 @@ export default function ManageHousehold() {
         params: { user_id: user_id },
       })
       .then((res) => {
-        console.log(res.data);
+        console.log(res.data, 'house');
         setHousehold(res.data);
       });
   };
@@ -60,22 +54,23 @@ export default function ManageHousehold() {
   }, []);
 
   const handleDeleteHousehold = (id: number) => {
-    const reauthToken = localStorage.getItem('profiling_reauth');
+    const reauthToken = localStorage.getItem('profiling_reauth') as string;
+
+    console.log(id);
 
     if (reauthToken === '0') {
-      navigate('/login', { replace: true });
+      setShowReauth(true);
+      setStoreDeleteID(id);
+    } else {
+      axios
+        .delete(`${import.meta.env.VITE_PROFILING}/household.php`, {
+          data: { house_id: id },
+        })
 
-      // console.log(id);
-      // axios
-      //   .delete(`${import.meta.env.VITE_PROFILING}/household.php`, {
-      //     data: { house_id: id },
-      //   })
-      //   .then((res) => {
-      //     console.log(res.data);
-      //     decrypt();
-      //   });
-
-      localStorage.setItem('profiling_reauth', '1');
+        .then((res) => {
+          console.log(res.data);
+          decrypt();
+        });
     }
   };
 
@@ -196,6 +191,13 @@ export default function ManageHousehold() {
         <UpdateHousehold
           setShowUpdateForm={setShowUpdateForm}
           householdId={householdId}
+        />
+      )}
+
+      {showReauth && (
+        <VerifyPassword
+          storeDeleteID={storeDeleteID}
+          setShowReauth={setShowReauth}
         />
       )}
     </div>
