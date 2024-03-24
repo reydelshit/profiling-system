@@ -5,16 +5,22 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 
+import DOMPurify from 'dompurify';
+
 export default function Settings() {
+  // xss payload
+  // <img src='nevermind' onerror="alert('HACKED USING XSS');" />
+
   const [barangayCaptain, setBarangayCaptain] = useState<string>('');
   const [barangaySecretary, setBarangaySecretary] = useState<string>('');
   const [barangayTreasurer, setBarangayTreasurer] = useState<string>('');
 
-  const [barangayOfficials, setBarangayOfficials] = useState<any[]>([]);
-
   const [barangayName, setBarangayName] = useState<string>('');
   const [barangayAddress, setBarangayAddress] = useState<string>('');
   const secretKey = 'your_secret_key';
+
+  // sanitize dom input
+  const sanitizeBarangayName = DOMPurify.sanitize(barangayName);
 
   const [user_id, setUserId] = useState<string>('');
   const decrypt = () => {
@@ -37,7 +43,6 @@ export default function Settings() {
       })
       .then((res) => {
         console.log(res.data);
-        setBarangayOfficials(res.data);
         res.data.forEach((official: any) => {
           if (official.official_type === 'Barangay Captain') {
             setBarangayCaptain(official.official_name);
@@ -137,6 +142,8 @@ export default function Settings() {
               onChange={(e) => setBarangayName(e.target.value)}
             />
           </div>
+
+          <div dangerouslySetInnerHTML={{ __html: barangayName }} />
 
           <div>
             <Label className="my-2">Barangay Address</Label>
