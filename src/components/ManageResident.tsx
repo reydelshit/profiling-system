@@ -8,18 +8,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { Resident } from '@/entities/types';
 import axios from 'axios';
+import CryptoJS from 'crypto-js';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import VerifyPassword from './VerifyPassword';
 import AddResident from './manage-resident/AddResident';
 import UpdateResident from './manage-resident/UpdateResident';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import CryptoJS from 'crypto-js';
-import { Resident } from '@/entities/types';
-import VerifyPassword from './VerifyPassword';
 
 export default function ManageResident() {
   const [showAddResident, setShowAddResident] = useState<boolean>(false);
