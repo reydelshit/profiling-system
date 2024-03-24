@@ -27,7 +27,8 @@
     "react-password-strength-bar": "^0.4.1",
     "react-router-dom": "^6.20.0",
     "tailwind-merge": "^2.0.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
@@ -35,6 +36,7 @@
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
+    "@types/zxcvbn": "^4.4.4",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.10.0",
     "@vitejs/plugin-react-swc": "^3.5.0",

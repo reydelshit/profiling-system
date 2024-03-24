@@ -5,6 +5,7 @@ import PasswordStrengthBar from 'react-password-strength-bar';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
+import zxcvbn from 'zxcvbn';
 
 export default function Register() {
   const profiling_token = localStorage.getItem('profiling_token');
@@ -31,11 +32,21 @@ export default function Register() {
 
     console.log(credentials);
   };
+  const evaluatePasswordStrength = (password: string) => {
+    const result = zxcvbn(password);
+    return {
+      score: result.score,
+      feedback: result.feedback.suggestions,
+    };
+  };
 
   const handleRegister = () => {
-    if (!username || !password)
-      return setErrorInput('Please fill in all fields');
+    const { score } = evaluatePasswordStrength(password);
 
+    if (!username || !password || score < 4)
+      return setErrorInput(
+        'Please fill in all fields or password must be strong',
+      );
     axios
       .post(`${import.meta.env.VITE_PROFILING}/login.php`, {
         ...credentials,

@@ -8,9 +8,6 @@ import CryptoJS from 'crypto-js';
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
 export default function Login() {
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-
   const profiling_token = localStorage.getItem('profiling_token');
   const secretKey = 'your_secret_key';
   if (profiling_token) {
@@ -19,13 +16,13 @@ export default function Login() {
 
   const [errorInput, setErrorInput] = useState<string>('');
 
-  const [credentials, setCredentials] = useState([]);
+  const [credentials, setCredentials] = useState({
+    username: '',
+    password: '',
+  });
 
   const handleChange = (e: ChangeEvent) => {
     const { name, value } = e.target;
-
-    setUsername(value);
-    setPassword(value);
 
     setCredentials((values) => ({ ...values, [name]: value }));
 
@@ -37,14 +34,13 @@ export default function Login() {
     localStorage.setItem('profiling_token', ciphertext);
   };
   const handleLogin = () => {
-    if (!username || !password)
+    if (!credentials.username || !credentials.password)
       return setErrorInput('Please fill in all fields');
 
     axios
       .get(`${import.meta.env.VITE_PROFILING}/login.php`, {
         params: {
-          username: username,
-          password: password,
+          credentials,
         },
       })
       .then((res) => {
