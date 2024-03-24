@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import PasswordStrengthBar from 'react-password-strength-bar';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
-type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 import zxcvbn from 'zxcvbn';
+
+type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
 export default function Register() {
   const profiling_token = localStorage.getItem('profiling_token');
@@ -94,7 +95,7 @@ export default function Register() {
         </div>
 
         <h1 className="mb-[5rem] font-semibold text-3xl">
-          CROP MANAGEMENT AND HARVESTING SCHEDULE SYSTEM
+          BARANGAY GLAMANG PROFILING SYSTEM
         </h1>
 
         <Input
@@ -131,12 +132,14 @@ export default function Register() {
         />
 
         {errorInput.length > 0 && (
-          <p className="text-primary-red border-2 my-4 bg-white p-2 rounded-md font-semibold">
+          <p className="bg-red-500 border-2 my-4 text-white p-2 rounded-md font-semibold">
             {errorInput}
           </p>
         )}
 
-        <PasswordStrengthBar className="w-full my-4" password={password} />
+        {password.length > 0 && (
+          <PasswordStrengthBar className="w-full my-4" password={password} />
+        )}
 
         <Button className="w-[8rem] p-[2rem] text-2xl" onClick={handleRegister}>
           Register
