@@ -196,8 +196,11 @@ export default function ManageHousehold() {
 
       {showReauth && (
         <VerifyPassword
+          phpFile="household"
+          deleteIDColumn="house_id"
           storeDeleteID={storeDeleteID}
           setShowReauth={setShowReauth}
+          decrypt={decrypt}
         />
       )}
     </div>

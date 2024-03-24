@@ -5,45 +5,65 @@ import { Label } from './ui/label';
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 
+interface DataObject {
+  [key: string]: number;
+}
+
 export default function VerifyPassword({
   setShowReauth,
   storeDeleteID,
+  phpFile,
+  deleteIDColumn,
+  decrypt,
 }: {
   setShowReauth: (value: boolean) => void;
   storeDeleteID: number;
+  phpFile: string;
+  deleteIDColumn: string;
+  decrypt?: () => void;
 }) {
   const [verifyPassword, setVerifyPassword] = useState<string>('');
   const secretKey = 'your_secret_key';
+  const [error, setError] = useState<string>('');
 
-  const handleVerifyPassword = () => {
+  const deleteTable = async () => {
+    if (phpFile.length > 0 && deleteIDColumn.length > 0) {
+      const dataObject: DataObject = {};
+      dataObject[deleteIDColumn] = storeDeleteID;
+
+      await axios
+        .delete(`${import.meta.env.VITE_PROFILING}/${phpFile}.php`, {
+          data: dataObject,
+        })
+        .then((res) => {
+          console.log(res.data);
+          setShowReauth(false);
+
+          if (localStorage.getItem('profiling_reauth') === '0') {
+            localStorage.setItem('profiling_reauth', '1');
+          }
+
+          decrypt && decrypt();
+        });
+    }
+  };
+
+  const handleVerifyPassword = async () => {
     const user_id = localStorage.getItem('profiling_token') as string;
-    // const ciphertext = CryptoJS.AES.encrypt(
-    //   verifyPassword,
-    //   secretKey,
-    // ).toString();
 
     const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
     const plaintext = bytes.toString(CryptoJS.enc.Utf8);
 
-    axios
+    await axios
       .get(`${import.meta.env.VITE_PROFILING}/reauth.php`, {
         params: { user_id: plaintext, password: verifyPassword },
       })
       .then((res) => {
-        if (res.data && res.data.length > 0) {
-          axios
-            .delete(`${import.meta.env.VITE_PROFILING}/household.php`, {
-              data: { house_id: storeDeleteID },
-            })
-            .then((res) => {
-              console.log(res.data);
-              setShowReauth(false);
-
-              localStorage.setItem('profiling_reauth', '1');
-            });
+        if (res.data.length > 0) {
+          deleteTable();
+        } else {
+          setError('Invalid password');
         }
-
-        console.log(res.data);
       });
   };
 
@@ -65,6 +85,8 @@ export default function VerifyPassword({
             />
           </div>
         </div>
+
+        {error.length > 0 && <div className="text-red-500">{error}</div>}
 
         <div className="mt-[2rem]">
           <Button onClick={() => setShowReauth(false)}>Cancel</Button>

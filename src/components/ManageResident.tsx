@@ -19,6 +19,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import CryptoJS from 'crypto-js';
 import { Resident } from '@/entities/types';
+import VerifyPassword from './VerifyPassword';
 
 export default function ManageResident() {
   const [showAddResident, setShowAddResident] = useState<boolean>(false);
@@ -30,6 +31,9 @@ export default function ManageResident() {
   const [defaultDate] = useState(moment().format('YYYY-MM-DD'));
 
   const [residentSpecific, setResidentSpecific] = useState<Resident[]>([]);
+
+  const [showReauth, setShowReauth] = useState<boolean>(false);
+  const [storeDeleteID, setStoreDeleteID] = useState<number>(0);
 
   // clearance
 
@@ -93,15 +97,23 @@ export default function ManageResident() {
   }, []);
 
   const handleDeleteResident = (id: number) => {
+    const reauthToken = localStorage.getItem('profiling_reauth') as string;
+
     console.log(id);
-    axios
-      .delete(`${import.meta.env.VITE_PROFILING}/resident.php`, {
-        data: { resident_id: id },
-      })
-      .then((res) => {
-        console.log(res.data);
-        decrypt();
-      });
+
+    if (reauthToken === '0') {
+      setShowReauth(true);
+      setStoreDeleteID(id);
+    } else {
+      axios
+        .delete(`${import.meta.env.VITE_PROFILING}/resident.php`, {
+          data: { resident_id: id },
+        })
+        .then((res) => {
+          console.log(res.data);
+          decrypt();
+        });
+    }
   };
 
   const handleShowUpdateForm = (id: number) => {
@@ -277,6 +289,15 @@ export default function ManageResident() {
         <UpdateResident
           residentID={residentID}
           setShowUpdateForm={setShowUpdateForm}
+        />
+      )}
+
+      {showReauth && (
+        <VerifyPassword
+          phpFile="resident"
+          deleteIDColumn="resident_id"
+          storeDeleteID={storeDeleteID}
+          setShowReauth={setShowReauth}
         />
       )}
 
