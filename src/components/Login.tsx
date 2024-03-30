@@ -11,6 +11,7 @@ export default function Login() {
   const profiling_token = localStorage.getItem('profiling_token');
   const defaultRandomString = Math.random().toString(36).substring(7);
   const [randomString, setRandomString] = useState<string>(defaultRandomString);
+  const [randomStringInput, setRandomStringInput] = useState<string>('');
 
   const generateRandomString = () => {
     const randomString = Math.random().toString(36).substring(7);
@@ -43,6 +44,10 @@ export default function Login() {
   const handleLogin = () => {
     if (!credentials.username || !credentials.password)
       return setErrorInput('Please fill in all fields');
+
+    if (randomStringInput !== randomString) {
+      return setErrorInput('Verification failed. Please try again.');
+    }
 
     axios
       .get(`${import.meta.env.VITE_PROFILING}/login.php`, {
@@ -89,7 +94,7 @@ export default function Login() {
 
         <div className="w-full block">
           <div className="flex bg-gray-200 my-4 items-center justify-between rounded-md p-2">
-            <span className="font-semibold text-2xl tracking-widest">
+            <span className="font-semibold text-2xl tracking-[1.5rem]">
               {randomString}
             </span>
             <Button onClick={() => generateRandomString()}>Refresh</Button>
@@ -97,9 +102,8 @@ export default function Login() {
 
           <Input
             className="my-2 border-4 text-2xl border-primary-yellow rounded-full p-8 w-full text-primary-yellow focus:outline-none placeholder:text-primary-yellow placeholder:text-2xl placeholder:font-semibold"
-            type="password"
-            onChange={handleChange}
-            name="password"
+            type="text"
+            onChange={(e) => setRandomStringInput(e.target.value)}
             placeholder="Verify"
             required
           />
@@ -115,7 +119,7 @@ export default function Login() {
           Login
         </Button>
         {errorInput && (
-          <p className="text-primary-red border-2 bg-white p-2 rounded-md font-semibold">
+          <p className="text-red-600 border-2 bg-white p-2 rounded-md font-semibold">
             {errorInput}
           </p>
         )}
