@@ -12,6 +12,8 @@ import Root from './components/Root/Root.tsx';
 import Settings from './components/Settings.tsx';
 import './index.css';
 
+// remove the localStorage for expiration of the token
+
 const router = createBrowserRouter([
   {
     path: '/',

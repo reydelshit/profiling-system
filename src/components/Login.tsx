@@ -9,6 +9,13 @@ type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
 export default function Login() {
   const profiling_token = localStorage.getItem('profiling_token');
+  const defaultRandomString = Math.random().toString(36).substring(7);
+  const [randomString, setRandomString] = useState<string>(defaultRandomString);
+
+  const generateRandomString = () => {
+    const randomString = Math.random().toString(36).substring(7);
+    setRandomString(randomString);
+  };
   const secretKey = 'your_secret_key';
   if (profiling_token) {
     return <Navigate to="/" replace={true} />;
@@ -39,9 +46,7 @@ export default function Login() {
 
     axios
       .get(`${import.meta.env.VITE_PROFILING}/login.php`, {
-        params: {
-          credentials,
-        },
+        params: credentials,
       })
       .then((res) => {
         console.log(res.data);
@@ -82,11 +87,30 @@ export default function Login() {
           required
         />
 
+        <div className="w-full block">
+          <div className="flex bg-gray-200 my-4 items-center justify-between rounded-md p-2">
+            <span className="font-semibold text-2xl tracking-widest">
+              {randomString}
+            </span>
+            <Button onClick={() => generateRandomString()}>Refresh</Button>
+          </div>
+
+          <Input
+            className="my-2 border-4 text-2xl border-primary-yellow rounded-full p-8 w-full text-primary-yellow focus:outline-none placeholder:text-primary-yellow placeholder:text-2xl placeholder:font-semibold"
+            type="password"
+            onChange={handleChange}
+            name="password"
+            placeholder="Verify"
+            required
+          />
+        </div>
+
         <div className="w-full text-end px-2">
           <a href="/register" className="text-[1.2rem] underline">
             Create an account
           </a>
         </div>
+
         <Button className="w-[8rem] p-[2rem] text-2xl" onClick={handleLogin}>
           Login
         </Button>
