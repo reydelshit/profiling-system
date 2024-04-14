@@ -95,7 +95,7 @@ export default function Register() {
         </div>
 
         <h1 className="mb-[5rem] font-semibold text-3xl">
-          BARANGAY GLAMANG PROFILING SYSTEM
+          BARANGAY PROFILING SYSTEM
         </h1>
 
         <Input

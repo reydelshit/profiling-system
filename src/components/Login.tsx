@@ -69,9 +69,9 @@ export default function Login() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
-      <div className="flex flex-col items-center justify-center gap-2">
+      <div className="flex flex-col items-center justify-center gap-2 w-[38rem]">
         <h1 className="mb-[7rem] font-semibold text-3xl">
-          BARANGAY GLAMANG PROFILING SYSTEM
+          BARANGAY PROFILING SYSTEM
         </h1>
         {/* <Label className="mb-1 self-start text-sm">Username</Label> */}
         <Input
