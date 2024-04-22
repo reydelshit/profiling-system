@@ -1,46 +1,80 @@
+import axios from 'axios';
+import CryptoJS from 'crypto-js';
+import { useEffect, useState } from 'react';
+import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Button } from './ui/button';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+
+import DOMPurify from 'dompurify';
 
 export default function Settings() {
+  // xss payload
+  // <img src='nevermind' onerror="alert('HACKED USING XSS');" />
+
   const [barangayCaptain, setBarangayCaptain] = useState<string>('');
   const [barangaySecretary, setBarangaySecretary] = useState<string>('');
   const [barangayTreasurer, setBarangayTreasurer] = useState<string>('');
 
-  const [barangayOfficials, setBarangayOfficials] = useState<any[]>([]);
-
   const [barangayName, setBarangayName] = useState<string>('');
   const [barangayAddress, setBarangayAddress] = useState<string>('');
+  const secretKey = 'your_secret_key';
 
-  const fetchBarangayOfficials = () => {
-    axios.get(`${import.meta.env.VITE_PROFILING}/officials.php`).then((res) => {
-      console.log(res.data);
-      setBarangayOfficials(res.data);
+  // sanitize dom input
+  const sanitizeBarangayName = DOMPurify.sanitize(barangayName);
 
-      if (res.data[0].official_type === 'Barangay Captain')
-        setBarangayCaptain(res.data[0].official_name);
-      if (res.data[1].official_type === 'Barangay Secretary')
-        setBarangaySecretary(res.data[1].official_name);
-      if (res.data[2].official_type === 'Barangay Treasurer')
-        setBarangayTreasurer(res.data[2].official_name);
-    });
+  const [user_id, setUserId] = useState<string>('');
+  const decrypt = () => {
+    const user_id = localStorage.getItem('profiling_token') as string;
+    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
+    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+
+    console.log(plaintext);
+    setUserId(plaintext);
+
+    fetchBarangayOfficials(plaintext);
+    fetchBarangayDetails(plaintext);
   };
 
-  const fetchBarangayDetails = () => {
-    axios
-      .get(`${import.meta.env.VITE_PROFILING}/barangaydetails.php`)
+  const fetchBarangayOfficials = async (user_id: string) => {
+    if (user_id === '') return;
+    await axios
+      .get(`${import.meta.env.VITE_PROFILING}/officials.php`, {
+        params: { user_id: user_id },
+      })
       .then((res) => {
         console.log(res.data);
-        setBarangayName(res.data[0].barangay_name);
-        setBarangayAddress(res.data[0].barangay_address);
+        res.data.forEach((official: any) => {
+          if (official.official_type === 'Barangay Captain') {
+            setBarangayCaptain(official.official_name);
+          } else if (official.official_type === 'Barangay Secretary')
+            setBarangaySecretary(official.official_name);
+          else if (official.official_type === 'Barangay Treasurer')
+            setBarangayTreasurer(official.official_name);
+        });
+      });
+  };
+
+  const fetchBarangayDetails = async (user_id: string) => {
+    if (user_id === '') return;
+    await axios
+      .get(`${import.meta.env.VITE_PROFILING}/barangaydetails.php`, {
+        params: { user_id: user_id },
+      })
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.length > 0) {
+          setBarangayName(res.data[0].barangay_name);
+          setBarangayAddress(res.data[0].barangay_address);
+        } else {
+          console.log('No data found');
+        }
       });
   };
 
   useEffect(() => {
-    fetchBarangayOfficials();
-    fetchBarangayDetails();
+    decrypt();
+
+    // Promise.all([fetchBarangayOfficials(), fetchBarangayDetails()]);
   }, []);
 
   const handleSubmitCaptain = () => {
@@ -48,6 +82,7 @@ export default function Settings() {
       .post(`${import.meta.env.VITE_PROFILING}/officials.php`, {
         official_type: 'Barangay Captain',
         official_name: barangayCaptain,
+        user_id: user_id,
       })
       .then((res: any) => {
         console.log(res.data);
@@ -60,6 +95,7 @@ export default function Settings() {
       .post(`${import.meta.env.VITE_PROFILING}/officials.php`, {
         official_type: 'Barangay Secretary',
         official_name: barangaySecretary,
+        user_id: user_id,
       })
       .then((res: any) => {
         console.log(res.data);
@@ -72,6 +108,7 @@ export default function Settings() {
       .post(`${import.meta.env.VITE_PROFILING}/officials.php`, {
         official_type: 'Barangay Treasurer',
         official_name: barangayTreasurer,
+        user_id: user_id,
       })
       .then((res: any) => {
         console.log(res.data);
@@ -84,6 +121,7 @@ export default function Settings() {
       .post(`${import.meta.env.VITE_PROFILING}/barangaydetails.php`, {
         barangay_name: barangayName,
         barangay_address: barangayAddress,
+        user_id: user_id,
       })
       .then((res: any) => {
         console.log(res.data);
@@ -104,6 +142,8 @@ export default function Settings() {
               onChange={(e) => setBarangayName(e.target.value)}
             />
           </div>
+
+          <div dangerouslySetInnerHTML={{ __html: barangayName }} />
 
           <div>
             <Label className="my-2">Barangay Address</Label>

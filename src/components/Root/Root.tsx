@@ -1,4 +1,4 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 import App from '@/App';
 import Sidebar from '../Sidebar';
@@ -6,20 +6,20 @@ import Sidebar from '../Sidebar';
 export default function Root() {
   const location = useLocation();
 
-  const isLogin = localStorage.getItem('isLogin');
+  const profiling_token = localStorage.getItem('profiling_token');
 
   // if (location.pathname === '/login') return <App />;
 
-  if (!isLogin) {
-    return (window.location.href = '/login');
+  if (!profiling_token) {
+    return <Navigate to="/login" replace={true} />;
   }
 
   return (
-    <div className="w-full border-2">
+    <div className="w-full">
       {/* <Header /> */}
-      <div className="flex border-2">
+      <div className="flex ">
         <Sidebar />
-        <div className="w-full px-2">
+        <div className="w-full">
           {location.pathname === '/' ? <App /> : <Outlet />}
         </div>
       </div>

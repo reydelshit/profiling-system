@@ -1,40 +1,45 @@
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { useState } from 'react';
-import { Input } from './ui/input';
 import axios from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Input } from './ui/input';
+import CryptoJS from 'crypto-js';
+import { ClearanceType } from '@/entities/types';
 
-type ClearanceType = {
-  clearance_id: number;
-  resident_name: string;
-  resident_address: string;
-  resident_birthday: string;
-  resident_purpose: string;
-  resident_issued: string;
-  resident_until: string;
-};
 export default function Clearance() {
   const [searchClearance, setSearchClearance] = useState<string>('');
   const [clearance, setClearance] = useState<ClearanceType[]>([]);
 
-  const fetchClearance = async () => {
-    axios.get(`${import.meta.env.VITE_PROFILING}/clearance.php`).then((res) => {
-      console.log(res.data);
-      setClearance(res.data);
-    });
+  const secretKey = 'your_secret_key';
+
+  const decrypt = () => {
+    const user_id = localStorage.getItem('profiling_token') as string;
+    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
+    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+
+    fetchClearance(plaintext);
+  };
+
+  const fetchClearance = async (user_id: string) => {
+    axios
+      .get(`${import.meta.env.VITE_PROFILING}/clearance.php`, {
+        params: { user_id: user_id },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setClearance(res.data);
+      });
   };
 
   useEffect(() => {
-    fetchClearance();
+    decrypt();
   }, []);
 
   const handleDeleteClearance = (id: number) => {
@@ -45,12 +50,12 @@ export default function Clearance() {
       })
       .then((res) => {
         console.log(res.data);
-        fetchClearance();
+        decrypt();
       });
   };
 
   return (
-    <div>
+    <div className="px-[5rem]">
       <h1 className="text-4xl my-10">CLEARANCE</h1>
 
       <div id="household-table">
@@ -60,7 +65,7 @@ export default function Clearance() {
           onChange={(e) => setSearchClearance(e.target.value)}
         />
         <Table className="border-2">
-          <TableHeader className="bg-violet-500 ">
+          <TableHeader className="bg-pink-500 ">
             <TableRow>
               <TableHead className="text-white text-center">Name</TableHead>
               <TableHead className="text-white text-center">Address</TableHead>

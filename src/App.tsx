@@ -1,21 +1,12 @@
-import axios from 'axios';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useEffect } from 'react';
 import { PieChart } from '@mui/x-charts/PieChart';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import CryptoJS from 'crypto-js';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -56,30 +47,57 @@ function App() {
   const [barangayCaptain, setBarangayCaptain] = useState<string>('');
   const [barangaySecretary, setBarangaySecretary] = useState<string>('');
   const [barangayTreasurer, setBarangayTreasurer] = useState<string>('');
+  const secretKey = 'your_secret_key';
 
-  const fetchResidents = async () => {
-    axios.get(`${import.meta.env.VITE_PROFILING}/resident.php`).then((res) => {
-      console.log(res.data);
-      setResidents(res.data);
-    });
+  const [user_id, setUserId] = useState<string>('');
+  const decrypt = () => {
+    const user_id = localStorage.getItem('profiling_token') as string;
+    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
+    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+
+    console.log(plaintext);
+    setUserId(plaintext);
+
+    fetchBarangayOfficials(plaintext);
+    fetchResidents(plaintext);
+    getGenderPie(plaintext), getAgeGroup(plaintext);
   };
 
-  const fetchBarangayOfficials = () => {
-    axios.get(`${import.meta.env.VITE_PROFILING}/officials.php`).then((res) => {
-      console.log(res.data);
-
-      if (res.data[0].official_type === 'Barangay Captain')
-        setBarangayCaptain(res.data[0].official_name);
-      if (res.data[1].official_type === 'Barangay Secretary')
-        setBarangaySecretary(res.data[1].official_name);
-      if (res.data[2].official_type === 'Barangay Treasurer')
-        setBarangayTreasurer(res.data[2].official_name);
-    });
-  };
-
-  const getGenderPie = () => {
+  const fetchResidents = async (user_id: string) => {
     axios
-      .get(`${import.meta.env.VITE_PROFILING}/pie-chart-gender.php`)
+      .get(`${import.meta.env.VITE_PROFILING}/resident.php`, {
+        params: { user_id: user_id },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setResidents(res.data);
+      });
+  };
+
+  const fetchBarangayOfficials = (user_id: string) => {
+    axios
+      .get(`${import.meta.env.VITE_PROFILING}/officials.php`, {
+        params: { user_id: user_id },
+      })
+      .then((res) => {
+        console.log(res.data);
+
+        if (res.data.length > 0) {
+          if (res.data[0].official_type === 'Barangay Captain')
+            setBarangayCaptain(res.data[0].official_name);
+          if (res.data[1].official_type === 'Barangay Secretary')
+            setBarangaySecretary(res.data[1].official_name);
+          if (res.data[2].official_type === 'Barangay Treasurer')
+            setBarangayTreasurer(res.data[2].official_name);
+        }
+      });
+  };
+
+  const getGenderPie = (user_id: string) => {
+    axios
+      .get(`${import.meta.env.VITE_PROFILING}/pie-chart-gender.php`, {
+        params: { user_id: user_id },
+      })
       .then((res) => {
         console.log(res.data, 'gender');
         const gender = res.data.map(
@@ -103,9 +121,11 @@ function App() {
       });
   };
 
-  const getAgeGroup = () => {
+  const getAgeGroup = (user_id: string) => {
     axios
-      .get(`${import.meta.env.VITE_PROFILING}/pie-chart-age.php`)
+      .get(`${import.meta.env.VITE_PROFILING}/pie-chart-age.php`, {
+        params: { user_id: user_id },
+      })
       .then((res) => {
         const age = res.data.map(
           (stat: { count: number; age_group: string }, index: number) => {
@@ -131,17 +151,14 @@ function App() {
   };
 
   useEffect(() => {
-    getGenderPie();
-    getAgeGroup();
-    fetchResidents();
-    fetchBarangayOfficials();
+    decrypt();
   }, []);
 
   return (
-    <div className="w-full">
+    <div className="w-full px-[5rem]">
       <h1 className="text-4xl my-10">DASHBOARD</h1>
       <div className="flex gap-4 w-full justify-around p-2">
-        <Card className="text-start bg-violet-500 text-white w-full">
+        <Card className="text-start bg-pink-500 text-white w-full">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               TOTAL RESIDENTS
@@ -157,7 +174,7 @@ function App() {
       </div>
 
       <div className="flex gap-10 justify-around my-4">
-        <div className="flex w-[70%] p-2 mt-[2rem] gap-[1rem] ">
+        <div className="flex w-[70%] p-2 mt-[2rem] gap-[1rem] bg-pink-500 rounded-lg text-white">
           <div className="flex items-center ">
             <PieChart
               series={[
@@ -180,7 +197,7 @@ function App() {
           <div className="w-full">
             <h1 className="font-bold text-2xl mb-2">PIE CHART FOR GENDER</h1>
 
-            <div className="cursor-pointer text-start justify-between flex items-center font-bold h-[4rem] p-2 bg-violet-100 w-full rounded-lg px-2">
+            <div className="cursor-pointer text-start justify-between flex items-center font-bold h-[4rem] p-2 bg-white text-black w-full rounded-lg px-2">
               <h1 className="flex item-center">
                 <span className="text-[#5d383a] mr-2 text-xl">
                   {residents.length}
@@ -203,9 +220,9 @@ function App() {
           </div>
         </div>
 
-        <div className="w-[40%]">
-          <Table className="border-2">
-            <TableHeader className="bg-violet-500 ">
+        <div className="w-[40%] bg-pink-500  text-white rounded-2xl">
+          <Table>
+            <TableHeader>
               <TableRow>
                 <TableHead className="text-white">Purok/Zone</TableHead>
                 <TableHead className="text-white">Population</TableHead>
@@ -229,8 +246,8 @@ function App() {
         </div>
       </div>
 
-      <div className="flex">
-        <div className="text-2xl p-5 w-[70%] bg-violet-50 h-fit rounded-lg">
+      <div className="flex h-full gap-2 items-center">
+        <div className="text-2xl p-5 w-[70%] bg-pink-500 rounded-lg text-white h-full">
           <div>
             <Label>Barangay Captaion</Label>
             <p className="font-bold">{barangayCaptain}</p>
@@ -267,7 +284,7 @@ function App() {
               height={300}
             />
           </div>
-          <div className="w-full">
+          <div className="w-full ">
             <h1 className="font-bold text-2xl mb-2">PIE CHART FOR AGE</h1>
 
             <div className="flex gap-7 mt-[2rem] ">

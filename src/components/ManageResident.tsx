@@ -1,49 +1,25 @@
-import AddResident from './manage-resident/AddResident';
-import { Button } from './ui/button';
-import { useState } from 'react';
+import DefaultProfile from '@/assets/default.jpg';
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import axios from 'axios';
-import { useEffect } from 'react';
-import { Input } from './ui/input';
-import UpdateResident from './manage-resident/UpdateResident';
-import DefaultProfile from '@/assets/default.jpg';
-import { Link } from 'react-router-dom';
-import { Label } from './ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Resident } from '@/entities/types';
+import axios from 'axios';
+import CryptoJS from 'crypto-js';
 import moment from 'moment';
-
-type Resident = {
-  resident_id: number;
-
-  resident_firstname: string;
-  resident_middlename: string;
-  resident_lastname: string;
-  resident_extension: string;
-  resident_birthday: string;
-  resident_place_of_birth: string;
-  resident_nationality: string;
-  resident_religion: string;
-  resident_weight: string;
-  resident_height: string;
-  resident_father_name: string;
-  resident_mother_name: string;
-  resident_houseno: string;
-
-  resident_gender: string;
-  resident_image: string;
-  resident_type: string;
-  resident_civilstatus: string;
-  resident_purok: string;
-  resident_address: string;
-};
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import VerifyPassword from './VerifyPassword';
+import AddResident from './manage-resident/AddResident';
+import UpdateResident from './manage-resident/UpdateResident';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 
 export default function ManageResident() {
   const [showAddResident, setShowAddResident] = useState<boolean>(false);
@@ -56,6 +32,9 @@ export default function ManageResident() {
 
   const [residentSpecific, setResidentSpecific] = useState<Resident[]>([]);
 
+  const [showReauth, setShowReauth] = useState<boolean>(false);
+  const [storeDeleteID, setStoreDeleteID] = useState<number>(0);
+
   // clearance
 
   const [residentName, setResidentName] = useState<string>('');
@@ -65,11 +44,29 @@ export default function ManageResident() {
   const [residentIssuedDate, setResidentIssuedDate] = useState<string>('');
   const [residentValidUntil, setResidentValidUntil] = useState<string>('');
 
-  const fetchResidents = async () => {
-    axios.get(`${import.meta.env.VITE_PROFILING}/resident.php`).then((res) => {
-      console.log(res.data);
-      setResidents(res.data);
-    });
+  const secretKey = 'your_secret_key';
+
+  const [user_id, setUserId] = useState<string>('');
+  const decrypt = () => {
+    const user_id = localStorage.getItem('profiling_token') as string;
+    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
+    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+
+    console.log(plaintext);
+    setUserId(plaintext);
+
+    fetchResidents(plaintext);
+  };
+
+  const fetchResidents = async (user_id: string) => {
+    await axios
+      .get(`${import.meta.env.VITE_PROFILING}/resident.php`, {
+        params: { user_id: user_id },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setResidents(res.data);
+      });
   };
 
   const fetchResidentSpecific = (id: number) => {
@@ -96,19 +93,27 @@ export default function ManageResident() {
   };
 
   useEffect(() => {
-    fetchResidents();
+    decrypt();
   }, []);
 
   const handleDeleteResident = (id: number) => {
+    const reauthToken = localStorage.getItem('profiling_reauth') as string;
+
     console.log(id);
-    axios
-      .delete(`${import.meta.env.VITE_PROFILING}/resident.php`, {
-        data: { resident_id: id },
-      })
-      .then((res) => {
-        console.log(res.data);
-        fetchResidents();
-      });
+
+    if (reauthToken === '0') {
+      setShowReauth(true);
+      setStoreDeleteID(id);
+    } else {
+      axios
+        .delete(`${import.meta.env.VITE_PROFILING}/resident.php`, {
+          data: { resident_id: id },
+        })
+        .then((res) => {
+          console.log(res.data);
+          decrypt();
+        });
+    }
   };
 
   const handleShowUpdateForm = (id: number) => {
@@ -159,11 +164,11 @@ export default function ManageResident() {
   };
 
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-dvh relative px-[5rem]">
       <h1 className="text-4xl my-10">MANAGE RESIDENT</h1>
 
       <div className="w-[100%] flex justify-center items-center mt-[2rem]">
-        <div className="w-[80%] mt-[5rem] flex flex-col">
+        <div className="w-[90%] mt-[5rem] flex flex-col">
           <div className="w-full flex justify-between my-2">
             <div className="flex gap-2">
               <Button onClick={() => setShowAddResident(!showAddResident)}>
@@ -186,7 +191,7 @@ export default function ManageResident() {
             </div>
           </div>
           <Table className="border-2">
-            <TableHeader className="bg-violet-500 ">
+            <TableHeader className="bg-pink-500 ">
               <TableRow>
                 <TableHead className="text-white"></TableHead>
 
@@ -199,81 +204,100 @@ export default function ManageResident() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {residents
-                .filter(
-                  (resi) =>
-                    resi.resident_lastname.includes(searchResident) ||
-                    resi.resident_firstname.includes(searchResident) ||
-                    resi.resident_middlename.includes(searchResident),
-                )
-                .map((resident, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <img
-                        className="w-[5rem] h-[5rem] object-contain rounded-lg  mb-4"
-                        src={
-                          resident.resident_image!
-                            ? resident.resident_image
-                            : DefaultProfile
-                        }
-                      />
-                    </TableCell>
-
-                    <TableCell>
-                      {resident.resident_firstname +
-                        ' ' +
-                        resident.resident_middlename +
-                        ' ' +
-                        resident.resident_lastname}
-                    </TableCell>
-                    <TableCell>{resident.resident_gender}</TableCell>
-                    <TableCell>{resident.resident_birthday}</TableCell>
-                    <TableCell>{resident.resident_houseno}</TableCell>
-                    <TableCell>{resident.resident_purok}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Link to={`/manage-resident/${resident.resident_id}`}>
-                          <Button> View </Button>
-                        </Link>
-
-                        <Button
-                          onClick={() =>
-                            handleShowUpdateForm(resident.resident_id)
+              {residents && residents.length > 0 ? (
+                residents &&
+                residents
+                  .filter(
+                    (resi) =>
+                      resi.resident_lastname.includes(searchResident) ||
+                      resi.resident_firstname.includes(searchResident) ||
+                      resi.resident_middlename.includes(searchResident),
+                  )
+                  .map((resident, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <img
+                          className="w-[5rem] h-[5rem] object-contain rounded-lg  mb-4"
+                          src={
+                            resident.resident_image!
+                              ? resident.resident_image
+                              : DefaultProfile
                           }
-                        >
-                          Update
-                        </Button>
-                        <Button
-                          onClick={() =>
-                            handleDeleteResident(resident.resident_id)
-                          }
-                        >
-                          Delete
-                        </Button>
+                        />
+                      </TableCell>
 
-                        <Button
-                          onClick={() =>
-                            handleShowClearanceForm(resident.resident_id)
-                          }
-                        >
-                          Issue Clearance
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      <TableCell>
+                        {resident.resident_firstname +
+                          ' ' +
+                          resident.resident_middlename +
+                          ' ' +
+                          resident.resident_lastname}
+                      </TableCell>
+                      <TableCell>{resident.resident_gender}</TableCell>
+                      <TableCell>{resident.resident_birthday}</TableCell>
+                      <TableCell>{resident.resident_houseno}</TableCell>
+                      <TableCell>{resident.resident_purok}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Link to={`/manage-resident/${resident.resident_id}`}>
+                            <Button> View </Button>
+                          </Link>
+
+                          <Button
+                            onClick={() =>
+                              handleShowUpdateForm(resident.resident_id)
+                            }
+                          >
+                            Update
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              handleDeleteResident(resident.resident_id)
+                            }
+                          >
+                            Delete
+                          </Button>
+
+                          <Button
+                            onClick={() =>
+                              handleShowClearanceForm(resident.resident_id)
+                            }
+                          >
+                            Issue Clearance
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+              ) : (
+                <TableRow className="text-center w-full">
+                  Resident is empty
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
       </div>
       {showAddResident && (
-        <AddResident setShowAddResident={setShowAddResident} />
+        <AddResident
+          user_id={user_id}
+          setShowAddResident={setShowAddResident}
+        />
       )}
 
       {showUpdateForm && (
         <UpdateResident
           residentID={residentID}
           setShowUpdateForm={setShowUpdateForm}
+        />
+      )}
+
+      {showReauth && (
+        <VerifyPassword
+          phpFile="resident"
+          deleteIDColumn="resident_id"
+          storeDeleteID={storeDeleteID}
+          setShowReauth={setShowReauth}
         />
       )}
 
