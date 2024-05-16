@@ -47,23 +47,10 @@ function App() {
   const [barangayCaptain, setBarangayCaptain] = useState<string>('');
   const [barangaySecretary, setBarangaySecretary] = useState<string>('');
   const [barangayTreasurer, setBarangayTreasurer] = useState<string>('');
-  const secretKey = 'your_secret_key';
 
-  const [user_id, setUserId] = useState<string>('');
-  const decrypt = () => {
-    const user_id = localStorage.getItem('profiling_token') as string;
-    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
-    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+  const user_id = localStorage.getItem('profiling_token') as string;
 
-    console.log(plaintext);
-    setUserId(plaintext);
-
-    fetchBarangayOfficials(plaintext);
-    fetchResidents(plaintext);
-    getGenderPie(plaintext), getAgeGroup(plaintext);
-  };
-
-  const fetchResidents = async (user_id: string) => {
+  const fetchResidents = () => {
     axios
       .get(`${import.meta.env.VITE_PROFILING}/resident.php`, {
         params: { user_id: user_id },
@@ -74,7 +61,7 @@ function App() {
       });
   };
 
-  const fetchBarangayOfficials = (user_id: string) => {
+  const fetchBarangayOfficials = () => {
     axios
       .get(`${import.meta.env.VITE_PROFILING}/officials.php`, {
         params: { user_id: user_id },
@@ -93,7 +80,7 @@ function App() {
       });
   };
 
-  const getGenderPie = (user_id: string) => {
+  const getGenderPie = () => {
     axios
       .get(`${import.meta.env.VITE_PROFILING}/pie-chart-gender.php`, {
         params: { user_id: user_id },
@@ -121,7 +108,7 @@ function App() {
       });
   };
 
-  const getAgeGroup = (user_id: string) => {
+  const getAgeGroup = () => {
     axios
       .get(`${import.meta.env.VITE_PROFILING}/pie-chart-age.php`, {
         params: { user_id: user_id },
@@ -151,14 +138,19 @@ function App() {
   };
 
   useEffect(() => {
-    decrypt();
+    Promise.all([
+      fetchResidents(),
+      fetchBarangayOfficials(),
+      getAgeGroup(),
+      getGenderPie(),
+    ]);
   }, []);
 
   return (
     <div className="w-full px-[5rem]">
-      <h1 className="text-4xl my-10">DASHBOARD</h1>
-      <div className="flex gap-4 w-full justify-around p-2">
-        <Card className="text-start bg-pink-500 text-white w-full">
+      <h1 className="text-6xl my-10 font-bold">DASHBOARD</h1>
+      <div className="flex gap-4 w-full justify-around ">
+        <Card className="text-start bg-[#1A4D2E] text-white w-full">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               TOTAL RESIDENTS
@@ -174,7 +166,7 @@ function App() {
       </div>
 
       <div className="flex gap-10 justify-around my-4">
-        <div className="flex w-[70%] p-2 mt-[2rem] gap-[1rem] bg-pink-500 rounded-lg text-white">
+        <div className="flex w-[70%] p-2 py-[2rem] gap-[1rem] bg-[#1A4D2E] rounded-lg text-white">
           <div className="flex items-center ">
             <PieChart
               series={[
@@ -199,28 +191,25 @@ function App() {
 
             <div className="cursor-pointer text-start justify-between flex items-center font-bold h-[4rem] p-2 bg-white text-black w-full rounded-lg px-2">
               <h1 className="flex item-center">
-                <span className="text-[#5d383a] mr-2 text-xl">
-                  {residents.length}
+                <span className="mr-2 text-xl font-bold">
+                  {residents.length} - Total Combined
                 </span>{' '}
-                Total Combined
               </h1>
               <span className="font-bold text-3xl">{'>'}</span>
             </div>
             <div className="grid grid-cols-2 place-content-center place-items-center gap-7 mt-[2rem] ">
-              <span className="flex items-center gap-2">
-                <div className="bg-purple-900 rounded-sm p-4 w-[2rem]"></div>{' '}
+              <span className="flex items-center gap-2 bg-purple-900 p-4 rounded-xl font-bold w-full">
                 Male
               </span>
 
-              <span className="flex items-center gap-2">
-                <div className="bg-yellow-400 rounded-sm p-4 w-[2rem]"></div>{' '}
+              <span className="flex items-center gap-2 bg-yellow-400 p-4 rounded-xl font-bold w-full text-black">
                 Female
               </span>
             </div>
           </div>
         </div>
 
-        <div className="w-[40%] bg-pink-500  text-white rounded-2xl">
+        <div className="w-[40%] bg-[#1A4D2E]  text-white rounded-2xl">
           <Table>
             <TableHeader>
               <TableRow>
@@ -247,7 +236,7 @@ function App() {
       </div>
 
       <div className="flex h-full gap-2 items-center">
-        <div className="text-2xl p-5 w-[70%] bg-pink-500 rounded-lg text-white h-full">
+        <div className="text-2xl p-5 w-[70%] bg-[#1A4D2E] rounded-lg text-white h-full">
           <div>
             <Label>Barangay Captaion</Label>
             <p className="font-bold">{barangayCaptain}</p>

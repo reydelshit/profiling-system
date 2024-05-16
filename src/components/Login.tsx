@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -13,11 +13,29 @@ export default function Login() {
   const [randomString, setRandomString] = useState<string>(defaultRandomString);
   const [randomStringInput, setRandomStringInput] = useState<string>('');
 
-  const generateRandomString = () => {
-    const randomString = Math.random().toString(36).substring(7);
-    setRandomString(randomString);
-  };
-  const secretKey = 'your_secret_key';
+  // const generateRandomString = () => {
+  //   const randomString = Math.random().toString(36).substring(7);
+  //   setRandomString(randomString);
+  // };
+
+  const [disabledFiveMinutes, setDisabledFiveMinutes] =
+    useState<boolean>(false);
+  const [remainingTime, setRemainingTime] = useState(0);
+  const [warningText, setWarningText] = useState('');
+
+  useEffect(() => {
+    if (remainingTime > 0) {
+      setDisabledFiveMinutes(true);
+      const timer = setTimeout(() => {
+        setRemainingTime((prevTime) => prevTime - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setDisabledFiveMinutes(false);
+      localStorage.removeItem('login_attempt');
+    }
+  }, [remainingTime]);
+
   if (profiling_token) {
     return <Navigate to="/" replace={true} />;
   }
@@ -36,30 +54,54 @@ export default function Login() {
 
     console.log(credentials);
   };
-  const encrypt = (encrypt: string) => {
-    const ciphertext = CryptoJS.AES.encrypt(encrypt, secretKey).toString();
 
-    localStorage.setItem('profiling_token', ciphertext);
-  };
   const handleLogin = () => {
     if (!credentials.username || !credentials.password)
       return setErrorInput('Please fill in all fields');
 
-    if (randomStringInput !== randomString) {
-      return setErrorInput('Verification failed. Please try again.');
-    }
+    // if (randomStringInput !== randomString) {
+    //   return setErrorInput('Verification failed. Please try again.');
+    // }
+
+    const loginAttempt = localStorage.getItem('login_attempt');
 
     axios
       .get(`${import.meta.env.VITE_PROFILING}/login.php`, {
         params: credentials,
       })
       .then((res) => {
-        console.log(res.data);
-        encrypt(res.data[0].user_id.toString());
-        localStorage.setItem('profiling_reauth', '0');
+        if (res.data.length === 0) {
+          if (loginAttempt) {
+            const newLoginAttempt = parseInt(loginAttempt) + 1;
+            localStorage.setItem('login_attempt', newLoginAttempt.toString());
+            if (newLoginAttempt > 3) {
+              // alert();
 
-        if (res.data[0].user_id) {
-          window.location.href = '/';
+              setDisabledFiveMinutes(true);
+              setRemainingTime(20);
+              setWarningText('You have reached the maximum login attempt.');
+              setErrorInput('');
+            } else {
+              setErrorInput(
+                'Invalid username or password. You have ' +
+                  (4 - newLoginAttempt) +
+                  ' attempts left',
+              );
+              // alert('Invalid username or password');
+            }
+          } else {
+            localStorage.setItem('login_attempt', '1');
+            // alert('Invalid username or password');
+            setErrorInput('Invalid username or password');
+          }
+        } else {
+          console.log(res.data);
+          localStorage.setItem('profiling_token', res.data[0].user_id);
+          localStorage.setItem('profiling_reauth', '0');
+
+          if (res.data[0].user_id) {
+            window.location.href = '/';
+          }
         }
       })
       .catch((error) => {
@@ -70,13 +112,13 @@ export default function Login() {
   return (
     <div className="flex flex-col items-center justify-center h-screen">
       <div className="flex flex-col items-center justify-center gap-2 w-[38rem]">
-        <h1 className="mb-[7rem] font-semibold text-3xl">
+        <h1 className="mb-[7rem] font-bold text-6xl text-center">
           BARANGAY PROFILING SYSTEM
         </h1>
         {/* <Label className="mb-1 self-start text-sm">Username</Label> */}
         <Input
           onChange={handleChange}
-          className="mb-8 border-4 text-2xl border-primary-yellow rounded-full p-8 w-full text-primary-yellow focus:outline-none placeholder:text-primary-yellow placeholder:text-2xl placeholder:font-semibold"
+          className="mb-8 border-4  text-2xl rounded-full p-8 w-full text-primary-yellow focus:outline-none placeholder:text-primary-yellow placeholder:text-2xl placeholder:font-semibold"
           placeholder="Username"
           name="username"
           required
@@ -84,7 +126,7 @@ export default function Login() {
 
         {/* <Label className="mb-1 self-start text-sm">Password</Label> */}
         <Input
-          className="mb-2 border-4 text-2xl border-primary-yellow rounded-full p-8 w-full text-primary-yellow focus:outline-none placeholder:text-primary-yellow placeholder:text-2xl placeholder:font-semibold"
+          className="mb-2 border-4 text-2xl rounded-full p-8 w-full text-primary-yellow focus:outline-none placeholder:text-primary-yellow placeholder:text-2xl placeholder:font-semibold"
           type="password"
           onChange={handleChange}
           name="password"
@@ -92,7 +134,7 @@ export default function Login() {
           required
         />
 
-        <div className="w-full block">
+        {/* <div className="w-full block">
           <div className="flex bg-gray-200 my-4 items-center justify-between rounded-md p-2">
             <span className="font-semibold text-2xl tracking-[1.5rem]">
               {randomString}
@@ -101,13 +143,13 @@ export default function Login() {
           </div>
 
           <Input
-            className="my-2 border-4 text-2xl border-primary-yellow rounded-full p-8 w-full text-primary-yellow focus:outline-none placeholder:text-primary-yellow placeholder:text-2xl placeholder:font-semibold"
+            className="my-2 border-4 text-2xl rounded-full p-8 w-full text-primary-yellow focus:outline-none placeholder:text-primary-yellow placeholder:text-2xl placeholder:font-semibold"
             type="text"
             onChange={(e) => setRandomStringInput(e.target.value)}
             placeholder="Verify"
             required
           />
-        </div>
+        </div> */}
 
         <div className="w-full text-end px-2">
           <a href="/register" className="text-[1.2rem] underline">
@@ -115,14 +157,30 @@ export default function Login() {
           </a>
         </div>
 
-        <Button className="w-[8rem] p-[2rem] text-2xl" onClick={handleLogin}>
+        <Button
+          disabled={disabledFiveMinutes}
+          className={`w-[8rem] p-[2rem] text-2xl ${
+            disabledFiveMinutes ? 'cursor-not-allowed' : 'cursor-pointer'
+          }`}
+          onClick={handleLogin}
+        >
           Login
         </Button>
-        {errorInput && (
-          <p className="text-red-600 border-2 bg-white p-2 rounded-md font-semibold">
+        {errorInput ? (
+          <p className="text-red-600  bg-white p-2 rounded-md font-semibold">
             {errorInput}
           </p>
-        )}
+        ) : null}
+
+        {warningText && remainingTime != 0 ? (
+          <p className=" bg-white p-2 rounded-md font-semibold flex flex-col items-center">
+            <div className="blob"></div>
+            {warningText}
+            <span className="bg-red-600 text-white p-2 rounded-md">
+              Remaining time: {remainingTime}
+            </span>
+          </p>
+        ) : null}
       </div>
     </div>
   );

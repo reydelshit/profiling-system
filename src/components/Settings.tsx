@@ -1,5 +1,4 @@
 import axios from 'axios';
-import CryptoJS from 'crypto-js';
 import { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -17,27 +16,15 @@ export default function Settings() {
 
   const [barangayName, setBarangayName] = useState<string>('');
   const [barangayAddress, setBarangayAddress] = useState<string>('');
-  const secretKey = 'your_secret_key';
+
+  const user_id = localStorage.getItem('profiling_token') as string;
 
   // sanitize dom input
   const sanitizeBarangayName = DOMPurify.sanitize(barangayName);
 
-  const [user_id, setUserId] = useState<string>('');
-  const decrypt = () => {
-    const user_id = localStorage.getItem('profiling_token') as string;
-    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
-    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
-
-    console.log(plaintext);
-    setUserId(plaintext);
-
-    fetchBarangayOfficials(plaintext);
-    fetchBarangayDetails(plaintext);
-  };
-
-  const fetchBarangayOfficials = async (user_id: string) => {
+  const fetchBarangayOfficials = () => {
     if (user_id === '') return;
-    await axios
+    axios
       .get(`${import.meta.env.VITE_PROFILING}/officials.php`, {
         params: { user_id: user_id },
       })
@@ -54,9 +41,9 @@ export default function Settings() {
       });
   };
 
-  const fetchBarangayDetails = async (user_id: string) => {
+  const fetchBarangayDetails = () => {
     if (user_id === '') return;
-    await axios
+    axios
       .get(`${import.meta.env.VITE_PROFILING}/barangaydetails.php`, {
         params: { user_id: user_id },
       })
@@ -72,9 +59,7 @@ export default function Settings() {
   };
 
   useEffect(() => {
-    decrypt();
-
-    // Promise.all([fetchBarangayOfficials(), fetchBarangayDetails()]);
+    Promise.all([fetchBarangayOfficials(), fetchBarangayDetails()]);
   }, []);
 
   const handleSubmitCaptain = () => {

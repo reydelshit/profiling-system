@@ -2,28 +2,18 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
-import CryptoJS from 'crypto-js';
 
 export default function Sidebar() {
   const [barangayName, setBarangayName] = useState<string>('');
   const [barangayAddress, setBarangayAddress] = useState<string>('');
 
   const currentPath = useLocation().pathname;
+  const user_id = localStorage.getItem('profiling_token') as string;
 
-  const secretKey = 'your_secret_key';
-
-  const decrypt = () => {
-    const user_id = localStorage.getItem('profiling_token') as string;
-    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
-    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
-
-    fetchBarangayDetails(plaintext);
-  };
-
-  const fetchBarangayDetails = async (user_id: string) => {
+  const fetchBarangayDetails = () => {
     console.log(user_id);
 
-    await axios
+    axios
       .get(`${import.meta.env.VITE_PROFILING}/barangaydetails.php`, {
         params: {
           user_id: user_id,
@@ -41,7 +31,7 @@ export default function Sidebar() {
   };
 
   useEffect(() => {
-    decrypt();
+    fetchBarangayDetails();
   }, []);
 
   const handleLogout = () => {
@@ -51,8 +41,8 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="relative font-bold w-[25rem] h-screen flex flex-col items-center border-r-2 bg-pink-500 py-[2rem]  px-4">
-      <div className="text-center w-full text-white rounded-md bg-pink-300 p-2 my-5">
+    <div className="fixed font-bold w-[17rem] h-screen flex flex-col items-center border-r-2 bg-[#1A4D2E]  py-[2rem]  px-4">
+      <div className="text-center w-full text-white rounded-md bg-[#23663e]  p-2 my-5">
         <h2 className="text-3xl">
           {barangayName.length > 0 ? barangayName : 'No Barangay Name'}
         </h2>
@@ -64,7 +54,7 @@ export default function Sidebar() {
       <div className="mt-[15rem] w-full ">
         <Link
           className={`p-2 mb-2 flex items-center gap-2 text-white ${
-            currentPath === '/' ? 'bg-pink-300 text-black rounded-md ' : ''
+            currentPath === '/' ? 'bg-[#23663e]  text-black rounded-md ' : ''
           }`}
           to="/"
         >
@@ -72,20 +62,9 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          className={`p-2 mb-2 flex items-center gap-2 text-white  ${
-            currentPath === '/manage-resident'
-              ? 'bg-pink-300 text-black rounded-md '
-              : ''
-          }`}
-          to="/manage-resident"
-        >
-          Manage Resident
-        </Link>
-
-        <Link
           className={`p-2 mb-2 flex items-center gap-2  text-white ${
             currentPath === '/manage-household'
-              ? 'bg-pink-300 text-black rounded-md '
+              ? 'bg-[#23663e]  text-black rounded-md '
               : ''
           }`}
           to="/manage-household"
@@ -94,9 +73,20 @@ export default function Sidebar() {
         </Link>
 
         <Link
+          className={`p-2 mb-2 flex items-center gap-2 text-white  ${
+            currentPath === '/manage-resident'
+              ? 'bg-[#23663e]  text-black rounded-md '
+              : ''
+          }`}
+          to="/manage-resident"
+        >
+          Manage Resident
+        </Link>
+
+        <Link
           className={`p-2 mb-2 flex items-center gap-2 text-white ${
             currentPath === '/settings'
-              ? 'bg-pink-300 text-black rounded-md '
+              ? 'bg-[#23663e]  text-black rounded-md '
               : ''
           }`}
           to="/settings"

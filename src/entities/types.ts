@@ -39,4 +39,6 @@ export type Resident = {
   resident_civilstatus: string;
   resident_purok: string;
   resident_address: string;
+
+  user_id: number;
 };

@@ -3,8 +3,8 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import PasswordStrengthBar from 'react-password-strength-bar';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { Button } from './ui/button';
 import zxcvbn from 'zxcvbn';
+import { Button } from './ui/button';
 
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 

@@ -19,7 +19,7 @@ export default function Root() {
       {/* <Header /> */}
       <div className="flex ">
         <Sidebar />
-        <div className="w-full">
+        <div className="w-full ml-[14rem]">
           {location.pathname === '/' ? <App /> : <Outlet />}
         </div>
       </div>

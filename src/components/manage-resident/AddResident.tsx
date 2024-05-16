@@ -49,6 +49,8 @@ export default function AddResident({
     resident_houseno: '',
     resident_address: '',
   });
+  const [fullAddress, setFullAddress] = useState<string>('');
+  const [defaultPurok, setDefaultPurok] = useState<number | null>(null);
 
   const [household, setHousehold] = useState<Household[]>([]);
 
@@ -84,7 +86,11 @@ export default function AddResident({
         resident_image: image,
         resident_type: residentType,
         resident_civilstatus: civilStatus,
-        resident_purok: purok,
+        resident_address:
+          residentDemogprahy.resident_address.length > 0
+            ? residentDemogprahy.resident_address
+            : fullAddress,
+        resident_purok: defaultPurok != null ? defaultPurok : purok,
         resident_houseno: householdName,
         user_id: user_id,
       })
@@ -116,8 +122,19 @@ export default function AddResident({
   // resident_houseno
   const handleChangeHousehold = (event: string) => {
     const selectedValue = event;
-    console.log(selectedValue);
-    setHouseholdName(selectedValue);
+
+    const houseno = selectedValue.split('-')[0];
+
+    console.log(houseno);
+    setHouseholdName(houseno);
+
+    const address = selectedValue.split('-')[1].split('/')[0];
+
+    setFullAddress(address);
+
+    // set default purok
+    const purok = selectedValue.split('/')[1];
+    setDefaultPurok(parseInt(purok));
   };
 
   const handleResidentType = (event: string) => {
@@ -307,6 +324,10 @@ export default function AddResident({
               <SelectContent>
                 <SelectItem value="Single">Single</SelectItem>
                 <SelectItem value="Married">Married</SelectItem>
+                <SelectItem value="Seperated or Divorced">
+                  Seperated or Divorced
+                </SelectItem>
+                <SelectItem value="Widowed">Widowed</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -344,7 +365,16 @@ export default function AddResident({
                 </SelectTrigger>
                 <SelectContent>
                   {household.map((house, index) => (
-                    <SelectItem key={index} value={house.house_no}>
+                    <SelectItem
+                      key={index}
+                      value={
+                        house.house_no +
+                        '-' +
+                        house.house_address +
+                        '/' +
+                        house.house_purok
+                      }
+                    >
                       {house.house_no}
                     </SelectItem>
                   ))}
@@ -354,7 +384,7 @@ export default function AddResident({
             <div className="w-full ">
               <Label>Purok/Zone</Label>
 
-              <Select onValueChange={handlePurok}>
+              <Select value={String(defaultPurok)} onValueChange={handlePurok}>
                 <SelectTrigger>
                   <SelectValue placeholder="Purok" />
                 </SelectTrigger>
@@ -378,6 +408,8 @@ export default function AddResident({
                 onChange={handleInputChange}
                 name="resident_address"
                 className="w-full"
+                value={fullAddress}
+                readOnly
                 required
               />
             </div>

@@ -12,8 +12,9 @@ import { Resident } from '@/entities/types';
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useReactToPrint } from 'react-to-print';
 import VerifyPassword from './VerifyPassword';
 import AddResident from './manage-resident/AddResident';
 import UpdateResident from './manage-resident/UpdateResident';
@@ -43,23 +44,10 @@ export default function ManageResident() {
   const [residentPurpose, setResidentPurpose] = useState<string>('');
   const [residentIssuedDate, setResidentIssuedDate] = useState<string>('');
   const [residentValidUntil, setResidentValidUntil] = useState<string>('');
+  const user_id = localStorage.getItem('profiling_token') as string;
 
-  const secretKey = 'your_secret_key';
-
-  const [user_id, setUserId] = useState<string>('');
-  const decrypt = () => {
-    const user_id = localStorage.getItem('profiling_token') as string;
-    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
-    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
-
-    console.log(plaintext);
-    setUserId(plaintext);
-
-    fetchResidents(plaintext);
-  };
-
-  const fetchResidents = async (user_id: string) => {
-    await axios
+  const fetchResidents = () => {
+    axios
       .get(`${import.meta.env.VITE_PROFILING}/resident.php`, {
         params: { user_id: user_id },
       })
@@ -93,7 +81,7 @@ export default function ManageResident() {
   };
 
   useEffect(() => {
-    decrypt();
+    Promise.all([fetchResidents()]);
   }, []);
 
   const handleDeleteResident = (id: number) => {
@@ -111,7 +99,7 @@ export default function ManageResident() {
         })
         .then((res) => {
           console.log(res.data);
-          decrypt();
+          fetchResidents();
         });
     }
   };
@@ -146,22 +134,10 @@ export default function ManageResident() {
       });
   };
 
-  const handleTable = () => {
-    const printContents = document.getElementById('household-table')?.innerHTML;
-    const originalContents = document.body.innerHTML;
-
-    const printWindow = window.open('', '_blank');
-
-    if (printWindow) {
-      if (printContents && typeof printContents === 'string') {
-        printWindow.document.body.innerHTML = printContents;
-      }
-
-      printWindow.print();
-      printWindow.close();
-      document.body.innerHTML = originalContents;
-    }
-  };
+  const componentRef = useRef<HTMLTableElement>(null);
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current || null,
+  });
 
   return (
     <div className="w-full h-dvh relative px-[5rem]">
@@ -181,7 +157,7 @@ export default function ManageResident() {
             </div>
 
             <div className="flex gap-2 ">
-              <Button onClick={handleTable}>Export</Button>
+              <Button onClick={handlePrint}>Export</Button>
 
               <Input
                 onChange={(e) => setSearchResident(e.target.value)}
@@ -190,8 +166,8 @@ export default function ManageResident() {
               />
             </div>
           </div>
-          <Table className="border-2">
-            <TableHeader className="bg-pink-500 ">
+          <Table ref={componentRef} className="border-2">
+            <TableHeader className="bg-[#1A4D2E] ">
               <TableRow>
                 <TableHead className="text-white"></TableHead>
 
@@ -200,7 +176,9 @@ export default function ManageResident() {
                 <TableHead className="text-white">Birthday</TableHead>
                 <TableHead className="text-white">House No.</TableHead>
                 <TableHead className="text-white">Purok/Zone</TableHead>
-                <TableHead className="text-white">Actions</TableHead>
+                <TableHead className="text-white no-print text-center">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -234,10 +212,12 @@ export default function ManageResident() {
                           resident.resident_lastname}
                       </TableCell>
                       <TableCell>{resident.resident_gender}</TableCell>
-                      <TableCell>{resident.resident_birthday}</TableCell>
+                      <TableCell>
+                        {moment(resident.resident_birthday).format('LL')}
+                      </TableCell>
                       <TableCell>{resident.resident_houseno}</TableCell>
                       <TableCell>{resident.resident_purok}</TableCell>
-                      <TableCell>
+                      <TableCell className="no-print">
                         <div className="flex gap-2">
                           <Link to={`/manage-resident/${resident.resident_id}`}>
                             <Button> View </Button>
@@ -260,7 +240,7 @@ export default function ManageResident() {
 
                           <Button
                             onClick={() =>
-                              handleShowClearanceForm(resident.resident_id)
+                              handleShowClearanceForm(resident.user_id)
                             }
                           >
                             Issue Clearance
@@ -298,6 +278,7 @@ export default function ManageResident() {
           deleteIDColumn="resident_id"
           storeDeleteID={storeDeleteID}
           setShowReauth={setShowReauth}
+          funcFunction={fetchResidents}
         />
       )}
 

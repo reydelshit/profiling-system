@@ -1,9 +1,8 @@
+import axios from 'axios';
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import axios from 'axios';
-import CryptoJS from 'crypto-js';
 
 interface DataObject {
   [key: string]: number;
@@ -14,19 +13,18 @@ export default function VerifyPassword({
   storeDeleteID,
   phpFile,
   deleteIDColumn,
-  decrypt,
+  funcFunction,
 }: {
   setShowReauth: (value: boolean) => void;
   storeDeleteID: number;
   phpFile: string;
   deleteIDColumn: string;
-  decrypt?: () => void;
+  funcFunction?: () => void;
 }) {
   const [verifyPassword, setVerifyPassword] = useState<string>('');
-  const secretKey = 'your_secret_key';
   const [error, setError] = useState<string>('');
 
-  const deleteTable = async () => {
+  const functionVerifyPassword = async () => {
     if (phpFile.length > 0 && deleteIDColumn.length > 0) {
       const dataObject: DataObject = {};
       dataObject[deleteIDColumn] = storeDeleteID;
@@ -43,7 +41,7 @@ export default function VerifyPassword({
             localStorage.setItem('profiling_reauth', '1');
           }
 
-          decrypt && decrypt();
+          funcFunction && funcFunction();
         });
     }
   };
@@ -51,16 +49,13 @@ export default function VerifyPassword({
   const handleVerifyPassword = async () => {
     const user_id = localStorage.getItem('profiling_token') as string;
 
-    const bytes = CryptoJS.AES.decrypt(user_id.toString(), secretKey);
-    const plaintext = bytes.toString(CryptoJS.enc.Utf8);
-
     await axios
       .get(`${import.meta.env.VITE_PROFILING}/reauth.php`, {
-        params: { user_id: plaintext, password: verifyPassword },
+        params: { user_id: user_id, password: verifyPassword },
       })
       .then((res) => {
         if (res.data.length > 0) {
-          deleteTable();
+          functionVerifyPassword();
         } else {
           setError('Invalid password');
         }
