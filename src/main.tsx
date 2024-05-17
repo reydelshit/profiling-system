@@ -11,6 +11,7 @@ import Register from './components/Register.tsx';
 import Root from './components/Root/Root.tsx';
 import Settings from './components/Settings.tsx';
 import './index.css';
+import ActivityLog from './components/ActivityLog.tsx';
 
 // remove the localStorage for expiration of the token
 
@@ -42,6 +43,11 @@ const router = createBrowserRouter([
       {
         path: '/settings',
         element: <Settings />,
+      },
+
+      {
+        path: '/settings/activity-log',
+        element: <ActivityLog />,
       },
     ],
   },

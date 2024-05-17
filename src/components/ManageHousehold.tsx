@@ -17,6 +17,19 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useToast } from './ui/use-toast';
 import moment from 'moment';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import useLog from './useLog';
+
 export default function ManageHousehold() {
   const [household, setHousehold] = useState<Household[]>([]);
   const [showAddHousehold, setShowAddHousehold] = useState<boolean>(false);
@@ -67,6 +80,11 @@ export default function ManageHousehold() {
           });
 
           fetchHousehold();
+
+          useLog(
+            `You have deleted resident with id ${id} `,
+            'Delete',
+          ).handleUploadActivityLog();
         });
     }
   };
@@ -146,13 +164,36 @@ export default function ManageHousehold() {
                             >
                               Update
                             </Button>
-                            <Button
-                              onClick={() =>
-                                handleDeleteHousehold(house.house_id)
-                              }
-                            >
-                              Delete
-                            </Button>
+
+                            <AlertDialog>
+                              <AlertDialogTrigger>
+                                <Button>Delete</Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Are you absolutely sure?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will
+                                    permanently delete and remove the data from
+                                    our servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction>
+                                    <Button
+                                      onClick={() =>
+                                        handleDeleteHousehold(house.house_id)
+                                      }
+                                    >
+                                      Delete
+                                    </Button>
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </div>
                         </TableCell>
                       </TableRow>

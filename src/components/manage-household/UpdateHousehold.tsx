@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { Input } from '../ui/input';
 import { useToast } from '../ui/use-toast';
 import moment from 'moment';
+import useLog from '../useLog';
 
 export default function UpdateHousehold({
   setShowUpdateForm,
@@ -68,6 +69,11 @@ export default function UpdateHousehold({
 
         setShowUpdateForm(false);
         fetchHousehold();
+
+        useLog(
+          `You have updated household with id ${householdId}`,
+          'Update',
+        ).handleUploadActivityLog();
       });
 
     // window.location.reload();

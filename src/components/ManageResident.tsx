@@ -7,6 +7,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Resident } from '@/entities/types';
 import axios from 'axios';
@@ -21,6 +32,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useToast } from './ui/use-toast';
+import useLog from './useLog';
 export default function ManageResident() {
   const [showAddResident, setShowAddResident] = useState<boolean>(false);
   const [residents, setResidents] = useState<Resident[]>([]);
@@ -99,8 +111,20 @@ export default function ManageResident() {
           data: { resident_id: id },
         })
         .then((res) => {
-          console.log(res.data);
-          fetchResidents();
+          if (res.data.status === 'success') {
+            toast({
+              style: { background: '#1A4D2E', color: 'white' },
+              title: 'Resident Deleted Successfully 🎉',
+              description: moment().format('LLLL'),
+            });
+            setShowAddResident(false);
+            fetchResidents();
+
+            useLog(
+              `You have deleted resident with id ${id}`,
+              'Delete',
+            ).handleUploadActivityLog();
+          }
         });
     }
   };
@@ -237,13 +261,37 @@ export default function ManageResident() {
                           >
                             Update
                           </Button>
-                          <Button
-                            onClick={() =>
-                              handleDeleteResident(resident.resident_id)
-                            }
-                          >
-                            Delete
-                          </Button>
+
+                          <AlertDialog>
+                            <AlertDialogTrigger>
+                              <Button>Delete</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Are you absolutely sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will
+                                  permanently delete and remove the data from
+                                  our servers.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction>
+                                  {' '}
+                                  <Button
+                                    onClick={() =>
+                                      handleDeleteResident(resident.resident_id)
+                                    }
+                                  >
+                                    Delete
+                                  </Button>
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
 
                           <Button
                             onClick={() =>
@@ -269,6 +317,7 @@ export default function ManageResident() {
         <AddResident
           user_id={user_id}
           setShowAddResident={setShowAddResident}
+          fetchResidents={fetchResidents}
         />
       )}
 
@@ -276,6 +325,7 @@ export default function ManageResident() {
         <UpdateResident
           residentID={residentID}
           setShowUpdateForm={setShowUpdateForm}
+          fetchResidents={fetchResidents}
         />
       )}
 

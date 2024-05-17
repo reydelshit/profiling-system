@@ -1,3 +1,14 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -9,16 +20,18 @@ import {
 } from '@/components/ui/table';
 import { ClearanceType } from '@/entities/types';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { Input } from './ui/input';
 import moment from 'moment';
+import { useEffect, useRef, useState } from 'react';
+import { useReactToPrint } from 'react-to-print';
+import { Input } from './ui/input';
+import { useToast } from './ui/use-toast';
 
 export default function Clearance() {
   const [searchClearance, setSearchClearance] = useState<string>('');
   const [clearance, setClearance] = useState<ClearanceType[]>([]);
 
   const user_id = localStorage.getItem('profiling_token') as string;
-
+  const { toast } = useToast();
   const fetchClearance = () => {
     console.log(user_id, 'user_id');
     axios
@@ -42,10 +55,21 @@ export default function Clearance() {
         data: { clearance_id: id },
       })
       .then((res) => {
-        console.log(res.data);
-        fetchClearance();
+        if (res.data.status == 'success') {
+          toast({
+            style: { background: '#1A4D2E', color: 'white' },
+            title: 'Clearance Deleted Successfully 🎉',
+            description: moment().format('LLLL'),
+          });
+          fetchClearance();
+        }
       });
   };
+
+  const componentRef = useRef<HTMLTableRowElement>(null);
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current || null,
+  });
 
   return (
     <div className="px-[5rem]">
@@ -79,7 +103,11 @@ export default function Clearance() {
                 clearance.resident_name.includes(searchClearance),
               )
               .map((clearance, index) => (
-                <TableRow className="text-center" key={index}>
+                <TableRow
+                  ref={componentRef}
+                  className="text-center"
+                  key={index}
+                >
                   <TableCell>{clearance.resident_name}</TableCell>
                   <TableCell>{clearance.resident_address}</TableCell>
                   <TableCell>
@@ -95,16 +123,39 @@ export default function Clearance() {
                     {moment(clearance.resident_until).format('LL')}
                   </TableCell>
 
-                  <TableCell className="flex justify-center">
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() =>
-                          handleDeleteClearance(clearance.clearance_id)
-                        }
-                      >
-                        Delete
-                      </Button>
-                    </div>
+                  <TableCell className="flex justify-center gap-2">
+                    <AlertDialog>
+                      <AlertDialogTrigger>
+                        <Button>Delete</Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete and remove the data from our servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction>
+                            <Button
+                              onClick={() =>
+                                handleDeleteClearance(clearance.clearance_id)
+                              }
+                            >
+                              Delete
+                            </Button>
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+
+                    <Button onClick={handlePrint}>Export</Button>
+
+                    {/* <ClearancePrint clearance={clearance} /> */}
                   </TableCell>
                 </TableRow>
               ))}

@@ -11,13 +11,18 @@ import {
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Input } from '../ui/input';
+import { useToast } from '../ui/use-toast';
+import moment from 'moment';
+import useLog from '../useLog';
 
 export default function UpdateResident({
   setShowUpdateForm,
   residentID,
+  fetchResidents,
 }: {
   residentID: number;
   setShowUpdateForm: (value: boolean) => void;
+  fetchResidents: () => void;
 }) {
   const [image, setImage] = useState<string | null>(null);
   const [residentGender, setResidentGender] = useState<string>('');
@@ -48,6 +53,7 @@ export default function UpdateResident({
     resident_address: '',
   });
 
+  const { toast } = useToast();
   const fetchResident = () => {
     axios
       .get(`${import.meta.env.VITE_PROFILING}/resident.php`, {
@@ -96,9 +102,24 @@ export default function UpdateResident({
       })
       .then((res: any) => {
         console.log(res.data);
+
+        if (res.data.status === 'success') {
+          toast({
+            style: { background: '#1A4D2E', color: 'white' },
+            title: 'Resident Updated Successfully 🎉',
+            description: moment().format('LLLL'),
+          });
+          setShowUpdateForm(false);
+          fetchResidents();
+
+          useLog(
+            `You have updated resident with id ${residentID} `,
+            'Update',
+          ).handleUploadActivityLog();
+        }
       });
 
-    window.location.reload();
+    // window.location.reload();
   };
 
   const handleResidentGenderChange = (event: string) => {

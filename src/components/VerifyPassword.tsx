@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { useToast } from './ui/use-toast';
+import moment from 'moment';
 
 interface DataObject {
   [key: string]: number;
@@ -23,7 +25,7 @@ export default function VerifyPassword({
 }) {
   const [verifyPassword, setVerifyPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
-
+  const { toast } = useToast();
   const functionVerifyPassword = async () => {
     if (phpFile.length > 0 && deleteIDColumn.length > 0) {
       const dataObject: DataObject = {};
@@ -35,7 +37,14 @@ export default function VerifyPassword({
         })
         .then((res) => {
           console.log(res.data);
-          setShowReauth(false);
+          if (res.data.status === 'success') {
+            toast({
+              style: { background: '#1A4D2E', color: 'white' },
+              title: 'Resident Deleted Successfully 🎉',
+              description: moment().format('LLLL'),
+            });
+            setShowReauth(false);
+          }
 
           if (localStorage.getItem('profiling_reauth') === '0') {
             localStorage.setItem('profiling_reauth', '1');

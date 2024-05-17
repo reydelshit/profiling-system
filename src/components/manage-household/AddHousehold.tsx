@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { Input } from '../ui/input';
 import moment from 'moment';
 import { useToast } from '../ui/use-toast';
+import useLog from '../useLog';
 
 export default function AddHousehold({
   setShowAddHousehold,
@@ -52,6 +53,8 @@ export default function AddHousehold({
 
           setShowAddHousehold(false);
           fetchHousehold();
+
+          useLog(`You have added household`, 'Add').handleUploadActivityLog();
         }
       });
   };
@@ -82,7 +85,7 @@ export default function AddHousehold({
           <div className="w-full ">
             <Label>Purok/Zone</Label>
 
-            <Select onValueChange={handlePurok}>
+            <Select required onValueChange={handlePurok}>
               <SelectTrigger>
                 <SelectValue placeholder="Purok" />
               </SelectTrigger>

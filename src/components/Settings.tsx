@@ -19,6 +19,10 @@ import {
 import DOMPurify from 'dompurify';
 
 import md5 from 'md5';
+import moment from 'moment';
+import { useToast } from './ui/use-toast';
+import useLog from './useLog';
+import { Link } from 'react-router-dom';
 
 type ProfileType = {
   user_id: string;
@@ -32,19 +36,20 @@ export default function Settings() {
   // xss payload
   // <img src='nevermind' onerror="alert('HACKED USING XSS');" />
 
+  const [barangayName, setBarangayName] = useState<string>('');
+
+  // sanitize dom input
+  const sanitizeBarangayName = DOMPurify.sanitize(barangayName);
+
   const [barangayCaptain, setBarangayCaptain] = useState<string>('');
   const [barangaySecretary, setBarangaySecretary] = useState<string>('');
   const [barangayTreasurer, setBarangayTreasurer] = useState<string>('');
 
-  const [barangayName, setBarangayName] = useState<string>('');
   const [barangayAddress, setBarangayAddress] = useState<string>('');
 
   const [profileName, setProfileName] = useState<string>('' as string);
 
   const user_id = localStorage.getItem('profiling_token') as string;
-
-  // sanitize dom input
-  const sanitizeBarangayName = DOMPurify.sanitize(barangayName);
 
   const [profile, setProfile] = useState<ProfileType>({} as ProfileType);
   const [profileOldPassword, setProfileOldPassword] = useState<string>(
@@ -55,6 +60,7 @@ export default function Settings() {
   const [profilePassword, setProfilePassword] = useState<string>('');
   const [profileNewPassword, setProfileNewPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const { toast } = useToast();
 
   const fetchProfile = () => {
     axios
@@ -118,6 +124,11 @@ export default function Settings() {
       .then((res: any) => {
         console.log(res.data);
         window.location.reload();
+
+        useLog(
+          `You have added barangay captain ${barangayCaptain}`,
+          'Add',
+        ).handleUploadActivityLog();
       });
   };
 
@@ -131,6 +142,11 @@ export default function Settings() {
       .then((res: any) => {
         console.log(res.data);
         window.location.reload();
+
+        useLog(
+          `You have added barangay secretary ${barangaySecretary}`,
+          'Add',
+        ).handleUploadActivityLog();
       });
   };
 
@@ -144,6 +160,11 @@ export default function Settings() {
       .then((res: any) => {
         console.log(res.data);
         window.location.reload();
+
+        useLog(
+          `You have added barangay treasurer ${barangayTreasurer}`,
+          'Add',
+        ).handleUploadActivityLog();
       });
   };
 
@@ -157,6 +178,11 @@ export default function Settings() {
       .then((res: any) => {
         console.log(res.data);
         window.location.reload();
+
+        useLog(
+          `You have submitted barangay details `,
+          'Add',
+        ).handleUploadActivityLog();
       });
   };
 
@@ -170,7 +196,22 @@ export default function Settings() {
       })
       .then((res) => {
         console.log(res.data);
-        window.location.reload();
+        // window.location.reload();
+        if (res.data.status == 'success') {
+          toast({
+            style: { background: '#1A4D2E', color: 'white' },
+            title: 'Profle Updated Successfully 🎉',
+            description: moment().format('LLLL'),
+          });
+          // fetchClearance();
+
+          window.location.reload();
+
+          useLog(
+            `You have updated your profile`,
+            'Update',
+          ).handleUploadActivityLog();
+        }
       });
   };
 
@@ -196,7 +237,20 @@ export default function Settings() {
       })
       .then((res) => {
         console.log(res.data);
-        window.location.reload();
+        if (res.data.status == 'success') {
+          toast({
+            style: { background: '#1A4D2E', color: 'white' },
+            title: 'Password Changed Successfully 🎉',
+            description: moment().format('LLLL'),
+          });
+
+          window.location.reload();
+
+          useLog(
+            `You have updated your password`,
+            'Update',
+          ).handleUploadActivityLog();
+        }
       });
   };
 
@@ -331,16 +385,19 @@ export default function Settings() {
                 <AlertDialogTitle>Change Profile</AlertDialogTitle>
                 <AlertDialogDescription className="flex flex-col gap-2">
                   <Input
+                    type="password"
                     placeholder="Old Password"
                     onChange={(e) => setProfileOldPasswordInput(e.target.value)}
                   />
 
                   <Input
+                    type="password"
                     placeholder="New Password"
                     onChange={(e) => setProfileNewPassword(e.target.value)}
                   />
 
                   <Input
+                    type="password"
                     placeholder="Confirm Password"
                     onChange={(e) => setProfilePassword(e.target.value)}
                   />
@@ -355,7 +412,9 @@ export default function Settings() {
             </AlertDialogContent>
           </AlertDialog>
 
-          <Button>Activity Log</Button>
+          <Button>
+            <Link to="/settings/activity-log">View Activity Log</Link>
+          </Button>
         </div>
       </div>
 

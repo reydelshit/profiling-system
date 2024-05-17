@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useToast } from './ui/use-toast';
 import moment from 'moment';
+import useLog from './useLog';
 
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
@@ -95,6 +96,8 @@ export default function Login() {
             title: 'Login Successfully 🎉',
             description: moment().format('LLLL'),
           });
+
+          useLog(`You have logged in `, 'Login').handleUploadActivityLog();
 
           // if (res.data[0].user_id) {
           //   window.location.href = '/';

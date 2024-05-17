@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
 import { useToast } from './ui/use-toast';
 import moment from 'moment';
+import useLog from './useLog';
 
 export default function Sidebar() {
   const [barangayName, setBarangayName] = useState<string>('');
@@ -36,6 +37,8 @@ export default function Sidebar() {
   }, []);
 
   const handleLogout = () => {
+    useLog(`You have logged out `, 'Logout').handleUploadActivityLog();
+
     localStorage.removeItem('profiling_token');
     localStorage.removeItem('profiling_reauth');
     window.location.href = '/login';

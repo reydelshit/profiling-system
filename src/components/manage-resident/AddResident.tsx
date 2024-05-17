@@ -11,6 +11,9 @@ import {
 import { Button } from '@/components/ui/button';
 import axios from 'axios';
 import DefaultProfile from '@/assets/default.jpg';
+import { useToast } from '../ui/use-toast';
+import moment from 'moment';
+import useLog from '../useLog';
 
 type Household = {
   house_id: number;
@@ -22,9 +25,11 @@ type Household = {
 export default function AddResident({
   setShowAddResident,
   user_id,
+  fetchResidents,
 }: {
   setShowAddResident: (value: boolean) => void;
   user_id: string;
+  fetchResidents: () => void;
 }) {
   const [image, setImage] = useState<string | null>(null);
   const [residentGender, setResidentGender] = useState<string>('');
@@ -53,7 +58,7 @@ export default function AddResident({
   const [defaultPurok, setDefaultPurok] = useState<number | null>(null);
 
   const [household, setHousehold] = useState<Household[]>([]);
-
+  const { toast } = useToast();
   const fetchHousehold = async () => {
     axios
       .get(`${import.meta.env.VITE_PROFILING}/household.php`, {
@@ -96,9 +101,21 @@ export default function AddResident({
       })
       .then((res: any) => {
         console.log(res.data);
+
+        if (res.data.status === 'success') {
+          toast({
+            style: { background: '#1A4D2E', color: 'white' },
+            title: 'Resident Added Successfully 🎉',
+            description: moment().format('LLLL'),
+          });
+          setShowAddResident(false);
+          fetchResidents();
+
+          useLog(`You have added resident `, 'Add').handleUploadActivityLog();
+        }
       });
 
-    window.location.reload();
+    // window.location.reload();
   };
 
   const handleResidentGenderChange = (event: string) => {
