@@ -143,84 +143,90 @@ export default function UserProfile() {
   };
 
   return (
-    <div className="w-full flex flex-col justify-center items-center">
-      <h1 className="text-4xl my-10 uppercase">User Dashboard</h1>
+    <div className="w-full flex flex-col px-[5rem]">
+      <h1 className="text-6xl my-10 font-bold uppercase text-start">
+        User Profile
+      </h1>
 
-      <div className="w-[40rem]">
-        <div className="flex flex-col gap-2">
-          <Label className="my-2">Account Settings</Label>
+      <div className="flex justify-center items-center">
+        <div className="w-[40rem]">
+          <div className="flex flex-col gap-2">
+            <Label className="my-2 font-bold text-xl">Account Settings</Label>
 
-          <AlertDialog>
-            <AlertDialogTrigger className=" w-full">
-              {' '}
-              <Button onClick={fetchProfile} className="w-full">
-                Update Profile
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Change Profile</AlertDialogTitle>
-                <AlertDialogDescription>
-                  <Input
-                    placeholder="Fullname"
-                    onChange={(e) => setProfileName(e.target.value)}
-                    defaultValue={profile.fullname}
-                  />
+            <AlertDialog>
+              <AlertDialogTrigger className=" w-full">
+                {' '}
+                <Button onClick={fetchProfile} className="w-full">
+                  Update Profile
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Change Profile</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    <Input
+                      placeholder="Fullname"
+                      onChange={(e) => setProfileName(e.target.value)}
+                      defaultValue={profile.fullname}
+                    />
 
-                  {error && <p className="text-red-500">{error}</p>}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleUpdateProfile}>
-                  Save
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                    {error && <p className="text-red-500">{error}</p>}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleUpdateProfile}>
+                    Save
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
-          <AlertDialog>
-            <AlertDialogTrigger className=" w-full">
-              {' '}
-              <Button onClick={fetchProfile} className="w-full">
-                Change Password
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Change Profile</AlertDialogTitle>
-                <AlertDialogDescription className="flex flex-col gap-2">
-                  <Input
-                    type="password"
-                    placeholder="Old Password"
-                    onChange={(e) => setProfileOldPasswordInput(e.target.value)}
-                  />
+            <AlertDialog>
+              <AlertDialogTrigger className=" w-full">
+                {' '}
+                <Button onClick={fetchProfile} className="w-full">
+                  Change Password
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Change Profile</AlertDialogTitle>
+                  <AlertDialogDescription className="flex flex-col gap-2">
+                    <Input
+                      type="password"
+                      placeholder="Old Password"
+                      onChange={(e) =>
+                        setProfileOldPasswordInput(e.target.value)
+                      }
+                    />
 
-                  <Input
-                    type="password"
-                    placeholder="New Password"
-                    onChange={(e) => setProfileNewPassword(e.target.value)}
-                  />
+                    <Input
+                      type="password"
+                      placeholder="New Password"
+                      onChange={(e) => setProfileNewPassword(e.target.value)}
+                    />
 
-                  <Input
-                    type="password"
-                    placeholder="Confirm Password"
-                    onChange={(e) => setProfilePassword(e.target.value)}
-                  />
+                    <Input
+                      type="password"
+                      placeholder="Confirm Password"
+                      onChange={(e) => setProfilePassword(e.target.value)}
+                    />
 
-                  {error && <p className="text-red-500">{error}</p>}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <Button onClick={handleUpdatePassword}>Save</Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                    {error && <p className="text-red-500">{error}</p>}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <Button onClick={handleUpdatePassword}>Save</Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
-          <Button>
-            <Link to="/user-profile/activity-log">View Activity Log</Link>
-          </Button>
+            <Button>
+              <Link to="/user-profile/activity-log">View Activity Log</Link>
+            </Button>
+          </div>
         </div>
       </div>
 

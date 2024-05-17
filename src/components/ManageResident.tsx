@@ -172,7 +172,7 @@ export default function ManageResident() {
 
   return (
     <div className="w-full h-dvh relative px-[5rem]">
-      <h1 className="text-4xl my-10">MANAGE RESIDENT</h1>
+      <h1 className="text-6xl my-10 font-bold">MANAGE RESIDENT</h1>
 
       <div className="w-[100%] flex justify-center items-center mt-[2rem]">
         <div className="w-[90%] mt-[5rem] flex flex-col">

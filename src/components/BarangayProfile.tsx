@@ -162,90 +162,95 @@ export default function BarangayProfile() {
   };
 
   return (
-    <div className="w-full flex flex-col justify-center items-center">
-      <h1 className="text-4xl my-10 uppercase">Barangay Profile</h1>
-      <div className="w-[40rem]">
-        <h1 className="font-bold my-5">Barangay Details</h1>
+    <div className="w-full flex flex-col  px-[5rem]">
+      <h1 className="text-6xl my-10 font-bold uppercase text-start">
+        Barangay Profile
+      </h1>
 
-        <div className="flex-col flex">
-          <div>
-            <Label className="my-2">Barangay Name</Label>
+      <div className="w-full flex flex-col items-center justify-center">
+        <div className="w-[40rem]">
+          <h1 className="font-bold my-5">Barangay Details</h1>
+
+          <div className="flex-col flex">
+            <div>
+              <Label className="my-2">Barangay Name</Label>
+              <Input
+                defaultValue={barangayName}
+                onChange={(e) => setBarangayName(e.target.value)}
+              />
+            </div>
+
+            <div dangerouslySetInnerHTML={{ __html: barangayName }} />
+
+            <div>
+              <Label className="my-2">Barangay Address</Label>
+              <Input
+                defaultValue={barangayAddress}
+                onChange={(e) => setBarangayAddress(e.target.value)}
+              />
+            </div>
+
+            <Button
+              disabled={barangayName === ''}
+              onClick={handleSubmitBarangayDetails}
+              type="submit"
+              className="my-2 self-end"
+            >
+              Save
+            </Button>
+          </div>
+        </div>
+        <div className="w-[40rem]">
+          <h1 className="font-bold my-5">Barangay Officials</h1>
+
+          <div className="flex-col flex">
+            <Label className="my-2">Barangay Captain</Label>
             <Input
-              defaultValue={barangayName}
-              onChange={(e) => setBarangayName(e.target.value)}
+              defaultValue={barangayCaptain}
+              onChange={(e) => setBarangayCaptain(e.target.value)}
             />
+
+            <Button
+              disabled={barangayCaptain === ''}
+              onClick={handleSubmitCaptain}
+              type="submit"
+              className="my-2 self-end"
+            >
+              Save
+            </Button>
           </div>
 
-          <div dangerouslySetInnerHTML={{ __html: barangayName }} />
-
-          <div>
-            <Label className="my-2">Barangay Address</Label>
+          <div className="flex-col flex">
+            <Label className="my-2">Barangay Secretary</Label>
             <Input
-              defaultValue={barangayAddress}
-              onChange={(e) => setBarangayAddress(e.target.value)}
+              defaultValue={barangaySecretary}
+              onChange={(e) => setBarangaySecretary(e.target.value)}
             />
+            <Button
+              disabled={barangaySecretary === ''}
+              onClick={handleSubmitSecretary}
+              type="submit"
+              className="my-2 self-end"
+            >
+              Save
+            </Button>
           </div>
 
-          <Button
-            disabled={barangayName === ''}
-            onClick={handleSubmitBarangayDetails}
-            type="submit"
-            className="my-2 self-end"
-          >
-            Save
-          </Button>
-        </div>
-      </div>
-      <div className="w-[40rem]">
-        <h1 className="font-bold my-5">Barangay Officials</h1>
-
-        <div className="flex-col flex">
-          <Label className="my-2">Barangay Captain</Label>
-          <Input
-            defaultValue={barangayCaptain}
-            onChange={(e) => setBarangayCaptain(e.target.value)}
-          />
-
-          <Button
-            disabled={barangayCaptain === ''}
-            onClick={handleSubmitCaptain}
-            type="submit"
-            className="my-2 self-end"
-          >
-            Save
-          </Button>
-        </div>
-
-        <div className="flex-col flex">
-          <Label className="my-2">Barangay Secretary</Label>
-          <Input
-            defaultValue={barangaySecretary}
-            onChange={(e) => setBarangaySecretary(e.target.value)}
-          />
-          <Button
-            disabled={barangaySecretary === ''}
-            onClick={handleSubmitSecretary}
-            type="submit"
-            className="my-2 self-end"
-          >
-            Save
-          </Button>
-        </div>
-
-        <div className="flex-col flex">
-          <Label className="my-2">Barangay Treasurer</Label>
-          <Input
-            defaultValue={barangayTreasurer}
-            onChange={(e) => setBarangayTreasurer(e.target.value)}
-          />
-          <Button
-            disabled={barangayTreasurer === ''}
-            onClick={handleSubmitTreasurer}
-            type="submit"
-            className="my-2 self-end"
-          >
-            Save
-          </Button>
+          <div className="flex-col flex">
+            <Label className="my-2">Barangay Treasurer</Label>
+            <Input
+              defaultValue={barangayTreasurer}
+              onChange={(e) => setBarangayTreasurer(e.target.value)}
+            />
+            <Button
+              disabled={barangayTreasurer === ''}
+              onClick={handleSubmitTreasurer}
+              type="submit"
+              className="my-2 self-end"
+            >
+              Save
+            </Button>
+          </div>
         </div>
       </div>
 

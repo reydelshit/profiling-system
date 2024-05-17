@@ -103,7 +103,7 @@ export default function ManageHousehold() {
 
   return (
     <div className="w-full h-full relative px-[5rem]">
-      <h1 className="text-4xl my-10">MANAGE HOUSEHOLD</h1>
+      <h1 className="text-6xl my-10 font-bold">MANAGE HOUSEHOLD</h1>
 
       <div className="w-[100%] flex justify-center items-center mt-[2rem]">
         <div className="w-[90%] mt-[5rem] flex flex-col">

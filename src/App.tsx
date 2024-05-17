@@ -253,7 +253,7 @@ function App() {
           </div>
         </div>
 
-        <div className="flex w-[70%] p-2 mt-[2rem] gap-[2rem]">
+        <div className="flex w-[70%] p-2 gap-[2rem]">
           <div className="flex items-center">
             <PieChart
               series={[
@@ -274,7 +274,9 @@ function App() {
             />
           </div>
           <div className="w-full ">
-            <h1 className="font-bold text-2xl mb-2">PIE CHART FOR AGE</h1>
+            <h1 className="font-bold text-2xl mb-2 mt-[2rem]">
+              PIE CHART FOR AGE
+            </h1>
 
             <div className="flex gap-7 mt-[2rem] ">
               <div className="mb-2">

@@ -73,7 +73,9 @@ export default function Clearance() {
 
   return (
     <div className="px-[5rem]">
-      <h1 className="text-4xl my-10">CLEARANCE</h1>
+      <h1 className="text-6xl my-10 font-bold uppercase text-start">
+        clearance
+      </h1>
 
       <div id="household-table">
         <Input
