@@ -5,6 +5,9 @@ import Sidebar from '../Sidebar';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Toaster } from '../ui/toaster';
+import useLog from '../useLog';
+import { toast } from '../ui/use-toast';
+import moment from 'moment';
 
 type ProfileType = {
   user_id: string;
@@ -38,9 +41,61 @@ export default function Root() {
 
   // if (location.pathname === '/login') return <App />;
 
+  const handleLogout = () => {
+    useLog(`You have logged out `, 'Logout').handleUploadActivityLog();
+
+    localStorage.removeItem('profiling_token');
+    localStorage.removeItem('profiling_reauth');
+    <Navigate to="/login" replace={true} />;
+
+    toast({
+      style: { background: '#1A4D2E', color: 'white' },
+      title: 'Logout Successfully 🎉',
+      description: moment().format('LLLL'),
+    });
+  };
+
   if (!profiling_token) {
     return <Navigate to="/login" replace={true} />;
   }
+
+  const [idle, setIdle] = useState(false);
+
+  const timeout = 10000;
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    const resetIdleTimer = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        setIdle(true);
+        handleLogout();
+      }, timeout);
+    };
+
+    const handleUserActivity = () => {
+      if (idle) {
+        setIdle(false);
+      }
+      resetIdleTimer();
+    };
+
+    resetIdleTimer();
+
+    window.addEventListener('mousemove', handleUserActivity);
+    window.addEventListener('mousedown', handleUserActivity);
+    window.addEventListener('keypress', handleUserActivity);
+    window.addEventListener('scroll', handleUserActivity);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('mousemove', handleUserActivity);
+      window.removeEventListener('mousedown', handleUserActivity);
+      window.removeEventListener('keypress', handleUserActivity);
+      window.removeEventListener('scroll', handleUserActivity);
+    };
+  }, [timeout, idle, handleLogout]);
 
   return (
     <div className="w-full">

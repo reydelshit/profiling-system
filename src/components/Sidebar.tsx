@@ -41,7 +41,7 @@ export default function Sidebar() {
 
     localStorage.removeItem('profiling_token');
     localStorage.removeItem('profiling_reauth');
-    window.location.href = '/login';
+    <Navigate to="/login" replace={true} />;
 
     toast({
       style: { background: '#1A4D2E', color: 'white' },
