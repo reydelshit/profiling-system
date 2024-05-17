@@ -32,7 +32,7 @@ type ProfileType = {
   fullname: string;
 };
 
-export default function Settings() {
+export default function BarangayProfile() {
   // xss payload
   // <img src='nevermind' onerror="alert('HACKED USING XSS');" />
 
@@ -47,32 +47,7 @@ export default function Settings() {
 
   const [barangayAddress, setBarangayAddress] = useState<string>('');
 
-  const [profileName, setProfileName] = useState<string>('' as string);
-
   const user_id = localStorage.getItem('profiling_token') as string;
-
-  const [profile, setProfile] = useState<ProfileType>({} as ProfileType);
-  const [profileOldPassword, setProfileOldPassword] = useState<string>(
-    '' as string,
-  );
-  const [profileOldPasswordInput, setProfileOldPasswordInput] =
-    useState<string>('');
-  const [profilePassword, setProfilePassword] = useState<string>('');
-  const [profileNewPassword, setProfileNewPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const { toast } = useToast();
-
-  const fetchProfile = () => {
-    axios
-      .get(`${import.meta.env.VITE_PROFILING}/profile.php`, {
-        params: { user_id: user_id },
-      })
-      .then((res) => {
-        console.log(res.data, 'profile');
-        setProfile(res.data[0]);
-        setProfileOldPassword(res.data[0].password);
-      });
-  };
 
   const fetchBarangayOfficials = () => {
     if (user_id === '') return;
@@ -186,77 +161,9 @@ export default function Settings() {
       });
   };
 
-  const handleUpdateProfile = () => {
-    // if (profileName === '') return setError('Fullname is required');
-
-    axios
-      .put(`${import.meta.env.VITE_PROFILING}/profile.php`, {
-        user_id: user_id,
-        fullname: profileName.length > 0 ? profileName : profile.fullname,
-      })
-      .then((res) => {
-        console.log(res.data);
-        // window.location.reload();
-        if (res.data.status == 'success') {
-          toast({
-            style: { background: '#1A4D2E', color: 'white' },
-            title: 'Profle Updated Successfully 🎉',
-            description: moment().format('LLLL'),
-          });
-          // fetchClearance();
-
-          window.location.reload();
-
-          useLog(
-            `You have updated your profile`,
-            'Update',
-          ).handleUploadActivityLog();
-        }
-      });
-  };
-
-  const handleUpdatePassword = () => {
-    fetchProfile();
-
-    console.log(
-      profileOldPassword,
-      md5(profileOldPasswordInput),
-      profilePassword,
-    );
-
-    if (profileOldPassword !== md5(profileOldPasswordInput))
-      return setError('Old password is incorrect');
-
-    if (profilePassword !== profileNewPassword)
-      return setError('New password does not match');
-
-    axios
-      .put(`${import.meta.env.VITE_PROFILING}/password.php`, {
-        user_id: user_id,
-        password: md5(profileNewPassword),
-      })
-      .then((res) => {
-        console.log(res.data);
-        if (res.data.status == 'success') {
-          toast({
-            style: { background: '#1A4D2E', color: 'white' },
-            title: 'Password Changed Successfully 🎉',
-            description: moment().format('LLLL'),
-          });
-
-          window.location.reload();
-
-          useLog(
-            `You have updated your password`,
-            'Update',
-          ).handleUploadActivityLog();
-        }
-      });
-  };
-
   return (
     <div className="w-full flex flex-col justify-center items-center">
-      <h1 className="text-4xl my-10">SETTINGS</h1>
+      <h1 className="text-4xl my-10 uppercase">Barangay Profile</h1>
       <div className="w-[40rem]">
         <h1 className="font-bold my-5">Barangay Details</h1>
 
@@ -338,82 +245,6 @@ export default function Settings() {
             className="my-2 self-end"
           >
             Save
-          </Button>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label className="my-2">Account Settings</Label>
-
-          <AlertDialog>
-            <AlertDialogTrigger className=" w-full">
-              {' '}
-              <Button onClick={fetchProfile} className="w-full">
-                Update Profile
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Change Profile</AlertDialogTitle>
-                <AlertDialogDescription>
-                  <Input
-                    placeholder="Fullname"
-                    onChange={(e) => setProfileName(e.target.value)}
-                    defaultValue={profile.fullname}
-                  />
-
-                  {error && <p className="text-red-500">{error}</p>}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleUpdateProfile}>
-                  Save
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-
-          <AlertDialog>
-            <AlertDialogTrigger className=" w-full">
-              {' '}
-              <Button onClick={fetchProfile} className="w-full">
-                Change Password
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Change Profile</AlertDialogTitle>
-                <AlertDialogDescription className="flex flex-col gap-2">
-                  <Input
-                    type="password"
-                    placeholder="Old Password"
-                    onChange={(e) => setProfileOldPasswordInput(e.target.value)}
-                  />
-
-                  <Input
-                    type="password"
-                    placeholder="New Password"
-                    onChange={(e) => setProfileNewPassword(e.target.value)}
-                  />
-
-                  <Input
-                    type="password"
-                    placeholder="Confirm Password"
-                    onChange={(e) => setProfilePassword(e.target.value)}
-                  />
-
-                  {error && <p className="text-red-500">{error}</p>}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <Button onClick={handleUpdatePassword}>Save</Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-
-          <Button>
-            <Link to="/settings/activity-log">View Activity Log</Link>
           </Button>
         </div>
       </div>

@@ -99,9 +99,20 @@ export default function Sidebar() {
               ? 'bg-[#23663e]  text-black rounded-md '
               : ''
           }`}
-          to="/settings"
+          to="/barangay-profile"
         >
-          Settings
+          Barangay Profile
+        </Link>
+
+        <Link
+          className={`p-2 mb-2 flex items-center gap-2 text-white ${
+            currentPath === '/settings'
+              ? 'bg-[#23663e]  text-black rounded-md '
+              : ''
+          }`}
+          to="/user-profile"
+        >
+          User Profile
         </Link>
       </div>
       <div className="absolute bottom-10">

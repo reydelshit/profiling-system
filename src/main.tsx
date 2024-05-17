@@ -9,9 +9,11 @@ import ManageResident from './components/ManageResident.tsx';
 import ManageResidentView from './components/ManageResidentView.tsx';
 import Register from './components/Register.tsx';
 import Root from './components/Root/Root.tsx';
-import Settings from './components/Settings.tsx';
+import Settings from './components/BarangayProfile.tsx';
 import './index.css';
 import ActivityLog from './components/ActivityLog.tsx';
+import BarangayProfile from './components/BarangayProfile.tsx';
+import UserProfile from './components/UserProfile.tsx';
 
 // remove the localStorage for expiration of the token
 
@@ -41,12 +43,16 @@ const router = createBrowserRouter([
       },
 
       {
-        path: '/settings',
-        element: <Settings />,
+        path: '/barangay-profile',
+        element: <BarangayProfile />,
       },
 
       {
-        path: '/settings/activity-log',
+        path: '/user-profile',
+        element: <UserProfile />,
+      },
+      {
+        path: '/user-profile/activity-log',
         element: <ActivityLog />,
       },
     ],
