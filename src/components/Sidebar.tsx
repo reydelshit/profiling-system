@@ -2,14 +2,15 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
+import { useToast } from './ui/use-toast';
+import moment from 'moment';
 
 export default function Sidebar() {
   const [barangayName, setBarangayName] = useState<string>('');
   const [barangayAddress, setBarangayAddress] = useState<string>('');
-
+  const { toast } = useToast();
   const currentPath = useLocation().pathname;
   const user_id = localStorage.getItem('profiling_token') as string;
-
   const fetchBarangayDetails = () => {
     console.log(user_id);
 
@@ -38,6 +39,12 @@ export default function Sidebar() {
     localStorage.removeItem('profiling_token');
     localStorage.removeItem('profiling_reauth');
     window.location.href = '/login';
+
+    toast({
+      style: { background: '#1A4D2E', color: 'white' },
+      title: 'Logout Successfully 🎉',
+      description: moment().format('LLLL'),
+    });
   };
 
   return (

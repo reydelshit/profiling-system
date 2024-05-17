@@ -15,6 +15,8 @@ import AddHousehold from './manage-household/AddHousehold';
 import UpdateHousehold from './manage-household/UpdateHousehold';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { useToast } from './ui/use-toast';
+import moment from 'moment';
 export default function ManageHousehold() {
   const [household, setHousehold] = useState<Household[]>([]);
   const [showAddHousehold, setShowAddHousehold] = useState<boolean>(false);
@@ -26,6 +28,7 @@ export default function ManageHousehold() {
 
   const user_id = localStorage.getItem('profiling_token') as string;
 
+  const { toast } = useToast();
   const fetchHousehold = () => {
     axios
       .get(`${import.meta.env.VITE_PROFILING}/household.php`, {
@@ -57,6 +60,12 @@ export default function ManageHousehold() {
 
         .then((res) => {
           console.log(res.data);
+          toast({
+            style: { background: '#1A4D2E', color: 'white' },
+            title: 'Deleted Household Successfully 🎉',
+            description: moment().format('LLLL'),
+          });
+
           fetchHousehold();
         });
     }
@@ -160,6 +169,7 @@ export default function ManageHousehold() {
         <AddHousehold
           user_id={user_id}
           setShowAddHousehold={setShowAddHousehold}
+          fetchHousehold={fetchHousehold}
         />
       )}
 
@@ -167,6 +177,7 @@ export default function ManageHousehold() {
         <UpdateHousehold
           setShowUpdateForm={setShowUpdateForm}
           householdId={householdId}
+          fetchHousehold={fetchHousehold}
         />
       )}
 

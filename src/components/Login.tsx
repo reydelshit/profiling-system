@@ -3,25 +3,23 @@ import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import CryptoJS from 'crypto-js';
+import { useToast } from './ui/use-toast';
+import moment from 'moment';
 
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
 export default function Login() {
   const profiling_token = localStorage.getItem('profiling_token');
-  const defaultRandomString = Math.random().toString(36).substring(7);
-  const [randomString, setRandomString] = useState<string>(defaultRandomString);
-  const [randomStringInput, setRandomStringInput] = useState<string>('');
-
-  // const generateRandomString = () => {
-  //   const randomString = Math.random().toString(36).substring(7);
-  //   setRandomString(randomString);
-  // };
-
+  const [errorInput, setErrorInput] = useState<string>('');
+  const [credentials, setCredentials] = useState({
+    username: '',
+    password: '',
+  });
   const [disabledFiveMinutes, setDisabledFiveMinutes] =
     useState<boolean>(false);
   const [remainingTime, setRemainingTime] = useState(0);
   const [warningText, setWarningText] = useState('');
+  const { toast } = useToast();
 
   useEffect(() => {
     if (remainingTime > 0) {
@@ -39,13 +37,6 @@ export default function Login() {
   if (profiling_token) {
     return <Navigate to="/" replace={true} />;
   }
-
-  const [errorInput, setErrorInput] = useState<string>('');
-
-  const [credentials, setCredentials] = useState({
-    username: '',
-    password: '',
-  });
 
   const handleChange = (e: ChangeEvent) => {
     const { name, value } = e.target;
@@ -99,9 +90,15 @@ export default function Login() {
           localStorage.setItem('profiling_token', res.data[0].user_id);
           localStorage.setItem('profiling_reauth', '0');
 
-          if (res.data[0].user_id) {
-            window.location.href = '/';
-          }
+          toast({
+            style: { background: '#1A4D2E', color: 'white' },
+            title: 'Login Successfully 🎉',
+            description: moment().format('LLLL'),
+          });
+
+          // if (res.data[0].user_id) {
+          //   window.location.href = '/';
+          // }
         }
       })
       .catch((error) => {

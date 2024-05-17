@@ -10,19 +10,24 @@ import {
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Input } from '../ui/input';
+import { useToast } from '../ui/use-toast';
+import moment from 'moment';
 
 export default function UpdateHousehold({
   setShowUpdateForm,
   householdId,
+  fetchHousehold,
 }: {
   householdId: number;
   setShowUpdateForm: (value: boolean) => void;
+  fetchHousehold: () => void;
 }) {
   const [purok, setPurok] = useState<string>('');
   const [houseNo, setHouseNo] = useState<string>('');
   const [address, setAddress] = useState<string>('');
+  const { toast } = useToast();
 
-  const fetchHousehold = () => {
+  const fetchHouseholdSpeci = () => {
     axios
       .get(`${import.meta.env.VITE_PROFILING}/household.php`, {
         params: { house_id: householdId },
@@ -38,7 +43,7 @@ export default function UpdateHousehold({
   };
 
   useEffect(() => {
-    fetchHousehold();
+    fetchHouseholdSpeci();
   }, []);
 
   const handleSubmitResidentDemo = (e: React.FormEvent<HTMLFormElement>) => {
@@ -54,9 +59,18 @@ export default function UpdateHousehold({
       })
       .then((res: any) => {
         console.log(res.data);
+
+        toast({
+          style: { background: '#1A4D2E', color: 'white' },
+          title: 'Updated Household Successfully 🎉',
+          description: moment().format('LLLL'),
+        });
+
+        setShowUpdateForm(false);
+        fetchHousehold();
       });
 
-    window.location.reload();
+    // window.location.reload();
   };
 
   const handlePurok = (event: string) => {

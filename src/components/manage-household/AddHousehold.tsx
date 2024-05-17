@@ -10,17 +10,23 @@ import {
 import axios from 'axios';
 import { useState } from 'react';
 import { Input } from '../ui/input';
+import moment from 'moment';
+import { useToast } from '../ui/use-toast';
 
 export default function AddHousehold({
   setShowAddHousehold,
   user_id,
+  fetchHousehold,
 }: {
   setShowAddHousehold: (value: boolean) => void;
   user_id: string;
+  fetchHousehold: () => void;
 }) {
   const [purok, setPurok] = useState<string>('');
   const [houseNo, setHouseNo] = useState<string>('');
   const [address, setAddress] = useState<string>('');
+
+  const { toast } = useToast();
 
   const handleSubmitResidentDemo = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,9 +42,18 @@ export default function AddHousehold({
       })
       .then((res: any) => {
         console.log(res.data);
-      });
 
-    window.location.reload();
+        if (res.data.status == 'success') {
+          toast({
+            style: { background: '#1A4D2E', color: 'white' },
+            title: 'Added Household Successfully 🎉',
+            description: moment().format('LLLL'),
+          });
+
+          setShowAddHousehold(false);
+          fetchHousehold();
+        }
+      });
   };
 
   const handlePurok = (event: string) => {

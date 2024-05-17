@@ -4,7 +4,29 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+
 import DOMPurify from 'dompurify';
+
+import md5 from 'md5';
+
+type ProfileType = {
+  user_id: string;
+  username: string;
+  password: string;
+  created_at: string;
+  fullname: string;
+};
 
 export default function Settings() {
   // xss payload
@@ -17,10 +39,34 @@ export default function Settings() {
   const [barangayName, setBarangayName] = useState<string>('');
   const [barangayAddress, setBarangayAddress] = useState<string>('');
 
+  const [profileName, setProfileName] = useState<string>('' as string);
+
   const user_id = localStorage.getItem('profiling_token') as string;
 
   // sanitize dom input
   const sanitizeBarangayName = DOMPurify.sanitize(barangayName);
+
+  const [profile, setProfile] = useState<ProfileType>({} as ProfileType);
+  const [profileOldPassword, setProfileOldPassword] = useState<string>(
+    '' as string,
+  );
+  const [profileOldPasswordInput, setProfileOldPasswordInput] =
+    useState<string>('');
+  const [profilePassword, setProfilePassword] = useState<string>('');
+  const [profileNewPassword, setProfileNewPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
+
+  const fetchProfile = () => {
+    axios
+      .get(`${import.meta.env.VITE_PROFILING}/profile.php`, {
+        params: { user_id: user_id },
+      })
+      .then((res) => {
+        console.log(res.data, 'profile');
+        setProfile(res.data[0]);
+        setProfileOldPassword(res.data[0].password);
+      });
+  };
 
   const fetchBarangayOfficials = () => {
     if (user_id === '') return;
@@ -113,6 +159,47 @@ export default function Settings() {
         window.location.reload();
       });
   };
+
+  const handleUpdateProfile = () => {
+    // if (profileName === '') return setError('Fullname is required');
+
+    axios
+      .put(`${import.meta.env.VITE_PROFILING}/profile.php`, {
+        user_id: user_id,
+        fullname: profileName.length > 0 ? profileName : profile.fullname,
+      })
+      .then((res) => {
+        console.log(res.data);
+        window.location.reload();
+      });
+  };
+
+  const handleUpdatePassword = () => {
+    fetchProfile();
+
+    console.log(
+      profileOldPassword,
+      md5(profileOldPasswordInput),
+      profilePassword,
+    );
+
+    if (profileOldPassword !== md5(profileOldPasswordInput))
+      return setError('Old password is incorrect');
+
+    if (profilePassword !== profileNewPassword)
+      return setError('New password does not match');
+
+    axios
+      .put(`${import.meta.env.VITE_PROFILING}/password.php`, {
+        user_id: user_id,
+        password: md5(profileNewPassword),
+      })
+      .then((res) => {
+        console.log(res.data);
+        window.location.reload();
+      });
+  };
+
   return (
     <div className="w-full flex flex-col justify-center items-center">
       <h1 className="text-4xl my-10">SETTINGS</h1>
@@ -199,7 +286,79 @@ export default function Settings() {
             Save
           </Button>
         </div>
+
+        <div className="flex flex-col gap-2">
+          <Label className="my-2">Account Settings</Label>
+
+          <AlertDialog>
+            <AlertDialogTrigger className=" w-full">
+              {' '}
+              <Button onClick={fetchProfile} className="w-full">
+                Update Profile
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Change Profile</AlertDialogTitle>
+                <AlertDialogDescription>
+                  <Input
+                    placeholder="Fullname"
+                    onChange={(e) => setProfileName(e.target.value)}
+                    defaultValue={profile.fullname}
+                  />
+
+                  {error && <p className="text-red-500">{error}</p>}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleUpdateProfile}>
+                  Save
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          <AlertDialog>
+            <AlertDialogTrigger className=" w-full">
+              {' '}
+              <Button onClick={fetchProfile} className="w-full">
+                Change Password
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Change Profile</AlertDialogTitle>
+                <AlertDialogDescription className="flex flex-col gap-2">
+                  <Input
+                    placeholder="Old Password"
+                    onChange={(e) => setProfileOldPasswordInput(e.target.value)}
+                  />
+
+                  <Input
+                    placeholder="New Password"
+                    onChange={(e) => setProfileNewPassword(e.target.value)}
+                  />
+
+                  <Input
+                    placeholder="Confirm Password"
+                    onChange={(e) => setProfilePassword(e.target.value)}
+                  />
+
+                  {error && <p className="text-red-500">{error}</p>}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <Button onClick={handleUpdatePassword}>Save</Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          <Button>Activity Log</Button>
+        </div>
       </div>
+
       {/* 
       <div className="w-[40rem]">
         <h1 className="font-bold my-5">Barangay Purok's</h1>

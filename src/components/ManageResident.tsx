@@ -10,7 +10,6 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Resident } from '@/entities/types';
 import axios from 'axios';
-import CryptoJS from 'crypto-js';
 import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -21,7 +20,7 @@ import UpdateResident from './manage-resident/UpdateResident';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-
+import { useToast } from './ui/use-toast';
 export default function ManageResident() {
   const [showAddResident, setShowAddResident] = useState<boolean>(false);
   const [residents, setResidents] = useState<Resident[]>([]);
@@ -46,6 +45,7 @@ export default function ManageResident() {
   const [residentValidUntil, setResidentValidUntil] = useState<string>('');
   const user_id = localStorage.getItem('profiling_token') as string;
 
+  const { toast } = useToast();
   const fetchResidents = () => {
     axios
       .get(`${import.meta.env.VITE_PROFILING}/resident.php`, {
@@ -58,6 +58,7 @@ export default function ManageResident() {
   };
 
   const fetchResidentSpecific = (id: number) => {
+    console.log(id);
     axios
       .get(`${import.meta.env.VITE_PROFILING}/resident.php`, {
         params: { resident_id: id },
@@ -127,10 +128,16 @@ export default function ManageResident() {
         resident_issued:
           residentIssuedDate.length > 0 ? residentIssuedDate : defaultDate,
         resident_until: residentValidUntil,
+        user_id: user_id,
       })
       .then((res) => {
         console.log(res.data);
         setShowClearanceForm(false);
+        toast({
+          style: { background: '#1A4D2E', color: 'white' },
+          title: 'Clearance Submitted Successfully 🎉',
+          description: moment().format('LLLL'),
+        });
       });
   };
 
@@ -240,7 +247,7 @@ export default function ManageResident() {
 
                           <Button
                             onClick={() =>
-                              handleShowClearanceForm(resident.user_id)
+                              handleShowClearanceForm(resident.resident_id)
                             }
                           >
                             Issue Clearance
