@@ -46,7 +46,7 @@ export default function Root() {
 
     localStorage.removeItem('profiling_token');
     localStorage.removeItem('profiling_reauth');
-    <Navigate to="/login" replace={true} />;
+    window.location.href = '/login';
 
     toast({
       style: { background: '#1A4D2E', color: 'white' },

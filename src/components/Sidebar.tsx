@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
 import { useToast } from './ui/use-toast';
 import moment from 'moment';
@@ -41,7 +41,7 @@ export default function Sidebar() {
 
     localStorage.removeItem('profiling_token');
     localStorage.removeItem('profiling_reauth');
-    <Navigate to="/login" replace={true} />;
+    window.location.href = '/login';
 
     toast({
       style: { background: '#1A4D2E', color: 'white' },
