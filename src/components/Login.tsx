@@ -1,11 +1,13 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useToast } from './ui/use-toast';
 import moment from 'moment';
 import useLog from './useLog';
+import useCaptcha from 'use-offline-captcha';
+import { IoRefresh } from 'react-icons/io5';
 
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
@@ -21,6 +23,26 @@ export default function Login() {
   const [remainingTime, setRemainingTime] = useState(0);
   const [warningText, setWarningText] = useState('');
   const { toast } = useToast();
+
+  const [value, setValue] = useState('');
+
+  const captchaRef = useRef<HTMLDivElement | null>(null);
+  const userOpt = {
+    type: 'mixed' as const,
+    length: 5 as const,
+    sensitive: false,
+    width: 200,
+    height: 50,
+    fontColor: '#000',
+    background: 'rgba(255, 255, 255, .2)',
+  };
+  const { gen, validate } = useCaptcha(captchaRef, userOpt);
+
+  useEffect(() => {
+    if (gen) gen();
+  }, [gen]);
+
+  const handleRefresh = () => gen();
 
   useEffect(() => {
     if (remainingTime > 0) {
@@ -50,6 +72,9 @@ export default function Login() {
   const handleLogin = () => {
     if (!credentials.username || !credentials.password)
       return setErrorInput('Please fill in all fields');
+
+    if (!validate(value))
+      return setErrorInput('Captch Verification failed. Please try again.');
 
     // if (randomStringInput !== randomString) {
     //   return setErrorInput('Verification failed. Please try again.');
@@ -132,6 +157,19 @@ export default function Login() {
           name="password"
           placeholder="Password"
           required
+        />
+
+        <div className="flex items-center gap-2">
+          <div ref={captchaRef} />
+
+          <IoRefresh className="text-[2rem]" onClick={handleRefresh} />
+        </div>
+
+        <Input
+          className="placeholder:text-center h-[3rem]"
+          placeholder="Enter captch here"
+          onChange={(e) => setValue(e.target.value)}
+          value={value}
         />
 
         {/* <div className="w-full block">
